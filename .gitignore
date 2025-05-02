@@ -1,0 +1,6 @@
+bin/
+obj/
+*.dep
+.vs/
+appsettings.json
+
