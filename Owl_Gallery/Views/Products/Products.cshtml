@@ -1,0 +1,288 @@
+﻿@model IEnumerable<Owl_Gallery.Models.Product>
+@using System.Security.Claims
+@inject Owl_Gallery.Data.ApplicationDbContext _ctx
+
+@{
+    ViewData["Title"] = "Shop All";
+
+    // Are we signed in?
+    bool signedIn = User.Identity?.IsAuthenticated == true;
+    var userId = signedIn
+        ? int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!)
+        : 0;
+
+    // Which products are in favorites?
+    var favSet = signedIn
+        ? _ctx.Favorites
+              .Where(f => f.UserId == userId)
+              .Select(f => f.ProductId)
+              .ToHashSet()
+        : new HashSet<int>();
+
+    // Current filter/sort values
+    var category = Context.Request.Query["category"].ToString();
+    var search = Context.Request.Query["search"].ToString();
+    var sort = Context.Request.Query["sort"].ToString();
+}
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<div class="page-header">
+    <div class="container">
+        <h1 data-aos="fade-up">All Products</h1>
+        <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="100">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    @ViewData["Title"]
+                </li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<section class="products-section">
+    <div class="container">
+        <div class="row">
+
+            <!-- FILTER SIDEBAR -->
+            <div class="col-lg-3">
+                <form method="get"
+                      asp-controller="Products"
+                      asp-action="Products"
+                      class="filters-sidebar p-4 bg-white rounded shadow-sm"
+                      data-aos="fade-right">
+
+                    <!-- Search -->
+                    <div class="mb-3">
+                        <label class="form-label">Search</label>
+                        <input name="search"
+                               type="text"
+                               class="form-control"
+                               placeholder="Keyword…"
+                               value="@search" />
+                    </div>
+
+                    <!-- Category -->
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-select">
+                            <option value="">All Categories</option>
+                            @foreach (var cat in new[] { "Necklaces", "Earrings", "Bracelets", "Rings" })
+                            {
+                                <option value="@cat" selected="@(cat == category)">
+                                    @cat
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Sort -->
+                    <div class="mb-3">
+                        <label class="form-label">Sort By</label>
+                        <select name="sort" class="form-select">
+                            <option value="" selected="@(String.IsNullOrEmpty(sort))">
+                                Featured
+                            </option>
+                            <option value="newest" selected="@(sort == "newest")">
+                                Newest
+                            </option>
+                            <option value="priceAsc" selected="@(sort == "priceAsc")">
+                                Price ↑
+                            </option>
+                            <option value="priceDesc" selected="@(sort == "priceDesc")">
+                                Price ↓
+                            </option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Apply</button>
+                    <a asp-controller="Products"
+                       asp-action="Products"
+                       class="btn btn-outline-secondary w-100 mt-2">
+                        Reset
+                    </a>
+                </form>
+            </div>
+
+            <!-- MAIN GRID -->
+            <div class="col-lg-9">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4" id="productsGrid">
+                    @foreach (var p in Model)
+                    {
+                        bool isFav = favSet.Contains(p.Id);
+                        <div class="col" data-aos="zoom-in">
+                            <div class="card h-100 shadow-sm position-relative overflow-hidden">
+                                @* SOLD OUT Badge *@
+                                @if (p.Quantity == 0)
+                                {
+                                    <div class="sold-out">Sold Out</div>
+                                }
+
+                                @* Low stock label positioned above the product name *@
+                                @if (p.Quantity > 0 && p.Quantity < 10)
+                                {
+                                    <div class="low-stock-badge">Only @p.Quantity left!</div>
+                                }
+
+                                <img src="@p.ImageUrl" class="card-img-top" alt="@p.Name" />
+
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="card-title">@p.Name</h6>
+
+                                    <p class="fw-semibold mb-2">
+                                        EGP @p.Price.ToString("F2")
+                                    </p>
+                                    <a asp-controller="Products"
+                                       asp-action="Details"
+                                       asp-route-id="@p.Id"
+                                       class="btn btn-outline-secondary mb-3 w-100">
+                                        View Details
+                                    </a>
+
+                                    <div class="d-flex gap-2 mt-auto">
+                                        @if (signedIn)
+                                        {
+                                            @if (isFav)
+                                            {
+                                                <form asp-controller="Favorites"
+                                                      asp-action="Remove"
+                                                      method="post"
+                                                      class="flex-fill">
+                                                    @Html.AntiForgeryToken()
+                                                    <input name="productId" type="hidden" value="@p.Id" />
+                                                    <button type="submit" class="btn btn-danger w-100" title="Remove from favorites">
+                                                        <i class="fas fa-heart"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-controller="Favorites"
+                                                      asp-action="Add"
+                                                      method="post"
+                                                      class="flex-fill">
+                                                    @Html.AntiForgeryToken()
+                                                    <input name="productId" type="hidden" value="@p.Id" />
+                                                    <button type="submit" class="btn btn-outline-danger w-100" title="Add to favorites">
+                                                        <i class="far fa-heart"></i>
+                                                    </button>
+                                                </form>
+                                            }
+
+                                            @if (p.Quantity > 0)
+                                            {
+                                                <form asp-controller="Cart" asp-action="Add" method="post" class="w-50">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="productId" value="@p.Id" />
+                                                    <button type="submit" class="btn btn-purple btn-glow w-100 py-2">
+                                                        <i class="fas fa-shopping-cart"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-secondary w-50" disabled>
+                                                    <i class="fas fa-shopping-cart"></i>
+                                                </button>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-outline-secondary flex-fill" onclick="location.href='@Url.Action("Login","Login")'">
+                                                <i class="far fa-heart"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary flex-fill" onclick="location.href='@Url.Action("Login","Login")'">
+                                                <i class="fas fa-shopping-cart"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-4">
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("Products", new { page = ViewBag.CurrentPage - 1, category = ViewBag.Category, search = ViewBag.Search, sort = ViewBag.Sort })">Previous</a>
+                            </li>
+
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Products", new { page = i, category = ViewBag.Category, search = ViewBag.Search, sort = ViewBag.Sort })">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("Products", new { page = ViewBag.CurrentPage + 1, category = ViewBag.Category, search = ViewBag.Search, sort = ViewBag.Sort })">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Styling for the "Only X left!" badge */
+
+    .low-stock-badge {
+        font-size: 1.1rem;
+        font-weight: bold;
+        background-color: #f44336; /* Dark Red */
+        color: white; /* White text */
+        padding: 0.5rem 1rem;
+        border-radius: 20px; /* Rounded corners */
+        text-align: center;
+        position: absolute;
+        top: 10px; /* Adjusted to move away from the top */
+        right: 10px; /* Placing it on the top-right corner */
+        z-index: 10; /* Ensure it's above the product image */
+        transition: transform 0.3s ease;
+    }
+
+        /* Hover effect to grab attention */
+        .low-stock-badge:hover {
+            transform: scale(1.1);
+        }
+
+    .sold-out {
+        font-size: 1.1rem;
+        font-weight: bold;
+        background-color: #6c757d; /* Dark Red */
+        color: white; /* White text */
+        padding: 0.5rem 1rem;
+        border-radius: 20px; /* Rounded corners */
+        text-align: center;
+        position: absolute;
+        top: 10px; /* Adjusted to move away from the top */
+        right: 10px; /* Placing it on the top-right corner */
+        z-index: 10; /* Ensure it's above the product image */
+        transition: transform 0.3s ease;
+    }
+
+        /* Hover effect to grab attention */
+        .sold-out:hover {
+            transform: scale(1.1);
+        }
+
+    /* Adjust product name positioning to make room for the badge */
+    .card-body {
+        padding-top: 2rem; /* Adds space between the image and product name */
+    }
+</style>
+
+@section Scripts {
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+    </script>
+}

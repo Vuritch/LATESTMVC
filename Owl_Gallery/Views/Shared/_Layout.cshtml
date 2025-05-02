@@ -1,0 +1,593 @@
+﻿@using System.Security.Claims
+@using Newtonsoft.Json
+@inject Owl_Gallery.Data.ApplicationDbContext _ctx
+
+@{
+    // — Authentication & badge counts —
+    bool signedIn = User?.Identity?.IsAuthenticated == true;
+    int userId = signedIn
+        ? int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!)
+        : 0;
+    string? firstName = signedIn
+        ? User.FindFirstValue(ClaimTypes.Name)?.Split(' ').FirstOrDefault()
+        : null;
+
+    // — Current route —
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] – Owl_Gallery</title>
+
+    <!-- Bootstrap & your CSS -->
+    <link rel="stylesheet" href="~/css/extras.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/animations.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dark-mode.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Owl_Gallery.styles.css" asp-append-version="true" />
+    <!-- Inside <head> section -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <style>
+        /* 1) Full-height layout */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-top: 70px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .content-wrap {
+            flex: 1 0 auto;
+        }
+
+        .site-footer {
+            flex-shrink: 0;
+            background: #f8f9fa;
+            padding: 1rem 0;
+        }
+
+        #welcome-banner {
+            font-size: 1.25rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+        }
+
+        /* --- NAV ICON --- */
+        .nav-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            font-size: 1.4rem;
+            color: #5d16c1;
+            cursor: pointer;
+            transition: color 0.3s;
+            text-decoration: none;
+            min-width: 3rem;
+            padding: 0.25rem 0;
+            line-height: 1.2;
+        }
+
+            .nav-icon .icon-label {
+                font-size: 0.75rem;
+                margin-top: 0.3rem;
+                line-height: 1;
+                text-align: center;
+                color: #333;
+            }
+
+            .nav-icon .badge {
+                position: absolute;
+                top: 0.2rem;
+                right: 0.2rem;
+                font-size: 0.65rem;
+                background-color: #5d16c1;
+                color: white;
+                padding: 2px 6px;
+                border-radius: 999px;
+            }
+
+            .nav-icon:hover i {
+                color: #3c0e99;
+            }
+
+            .nav-icon.dropdown-toggle::after {
+                display: none !important;
+            }
+
+        /* Dark Mode Support */
+        body.dark-mode {
+            background: #121212;
+            color: #e0e0e0;
+        }
+
+            body.dark-mode .navbar,
+            body.dark-mode .offcanvas,
+            body.dark-mode .dropdown-menu {
+                background-color: #212121 !important;
+                color: #ddd;
+            }
+
+                body.dark-mode .navbar .nav-link,
+                body.dark-mode a {
+                    color: #bb86fc !important;
+                }
+
+                    body.dark-mode .navbar .nav-link:hover,
+                    body.dark-mode .navbar .nav-link.active {
+                        color: #fff !important;
+                    }
+
+            body.dark-mode .card,
+            body.dark-mode .card-header,
+            body.dark-mode .card-body {
+                background-color: #1f1f1f;
+                color: #e0e0e0;
+            }
+
+        #searchDropdown {
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+            #searchDropdown.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        .nav-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            font-size: 1.4rem;
+            color: #5d16c1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            width: 3.5rem;
+            padding-top: 0.2rem;
+        }
+
+            .nav-icon i {
+                line-height: 1;
+            }
+
+        .icon-label {
+            font-size: 0.75rem;
+            line-height: 1;
+            text-align: center;
+            margin-top: 0.2rem;
+            color: #333;
+        }
+
+        .testimonials-section {
+            /* push it down a little from whatever’s above */
+            margin-top: 4rem;
+            padding-top: 2rem;
+            /* optional: a bit of bottom padding so it doesn’t cramp the footer */
+            padding-bottom: 4rem;
+            background: #fff;
+        }
+
+        .section-title {
+            display: inline-block; /* shrink to text width */
+            font-size: 2.5rem; /* adjust as needed */
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1.5rem;
+            position: relative; /* for the underline */
+        }
+
+        .testimonial-card {
+            margin-top: 1.5rem;
+            max-width: 500px;
+        }
+
+
+            /* Decorative underline */
+            .section-title::after {
+                content: "";
+                position: absolute;
+                bottom: -0.5rem;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 60px;
+                height: 4px;
+                background: #7648ff; /* your brand purple */
+                border-radius: 2px;
+            }
+
+        body.dark-mode .icon-label {
+            color: #ccc;
+        }
+
+        .nav-icon .badge {
+            position: absolute;
+            top: 0.2rem;
+            right: 0.1rem;
+            font-size: 0.65rem;
+            background: #5d16c1;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 999px;
+        }
+
+        @@media (max-width: 576px) {
+            .icon-label {
+                display: none;
+            }
+        }
+
+
+        body.dark-mode .icon-label {
+            color: #ccc;
+        }
+
+        /* Hide icon labels on very small screens */
+        @@media (max-width: 576px) {
+            .icon-label {
+                display: none;
+            }
+        }
+
+    </style>
+</head>
+<body data-login-url="@Url.Action("Login", "Login")">
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container-fluid bg-light shadow-sm px-4 py-2">
+            <a class="navbar-brand me-4" href="@Url.Action("Index","Home")">
+                <img src="~/images/logo.jpg"
+                     alt="Owl Gallery Logo"
+                     height="40"
+                     class="logo-round"
+                     asp-append-version="true" />
+            </a>
+            <form method="get" action="@Url.Action("Products", "Products")"
+                  class="search-box d-none d-lg-flex position-relative me-3 flex-shrink-0"
+                  style="width: 25%; min-width: 280px;" autocomplete="off">
+                <input name="search"
+                       id="searchInput"
+                       type="text"
+                       class="form-control rounded-pill px-4"
+                       placeholder="Search products…" />
+
+                <button class="btn position-absolute end-0 top-50 translate-middle-y me-2" type="submit">
+                    <i class="fas fa-search text-purple"></i>
+                </button>
+
+                <!-- Search Dropdown -->
+                <div id="searchDropdown"
+                     class="bg-white dark-mode-dropdown shadow rounded mt-2 p-3 position-absolute w-100"
+                     style="z-index: 2000; top: 100%; display: none;">
+
+                    <!-- Trending -->
+                    <div id="trendingCategories">
+                        <h6 class="text-purple fw-bold mb-3">Trending Categories</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a class="btn btn-outline-secondary btn-sm rounded-pill"
+                               href="@Url.Action("Products", "Products", new { category = "Necklaces" })">Necklaces</a>
+                            <a class="btn btn-outline-secondary btn-sm rounded-pill"
+                               href="@Url.Action("Products", "Products", new { category = "Earrings" })">Earrings</a>
+                            <a class="btn btn-outline-secondary btn-sm rounded-pill"
+                               href="@Url.Action("Products", "Products", new { category = "Bracelets" })">Bracelets</a>
+                            <a class="btn btn-outline-secondary btn-sm rounded-pill"
+                               href="@Url.Action("Products", "Products", new { category = "Rings" })">Rings</a>
+                        </div>
+                    </div>
+
+                    <!-- Live Search -->
+                    <div class="mt-4">
+                        <h6 class="text-purple fw-bold mb-2">Live Results</h6>
+                        <div id="liveResults" class="list-group">
+                            <div class="text-center text-muted small">Start typing to see results...</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+
+
+
+
+
+
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler ms-auto" type="button"
+                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Offcanvas Menu -->
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title">Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav justify-content-center flex-grow-1 gap-3">
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Index","Home")">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Products","Products")">Shop All</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Categories</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="@Url.Action("Products","Products", new { category="Necklaces" })">Necklaces</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Products","Products", new { category="Earrings"  })">Earrings</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Products","Products", new { category="Bracelets" })">Bracelets</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Products","Products", new { category="Rings"     })">Rings</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Sale","Products", new { filter="sale" })">Sale</a></li>
+                        @if (User.Identity.IsAuthenticated && User.FindFirst(ClaimTypes.Email)?.Value == "admin@gmail.com")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">
+                                    <i class="fas fa-tools me-1"></i>
+                                    Admin Dashboard
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right-hand Icons & Theme Toggle -->
+            <div class="nav-icons d-flex gap-3 align-items-center text-center">
+
+                @if (!signedIn)
+                {
+                    <!-- GUEST VIEW -->
+                    <div class="dropdown">
+                        <div class="nav-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Account" role="button">
+                            <i class="fas fa-user-circle"></i>
+                            <div class="icon-label">Account</div>
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Login", "Login")">
+                                    <i class="fas fa-sign-in-alt text-purple me-2"></i> Log In
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Register", "Register")">
+                                    <i class="fas fa-user-plus text-purple me-2"></i> Register
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <!-- LOGGED-IN VIEW -->
+                    <div class="dropdown">
+                        <a class="nav-icon dropdown-toggle p-0 d-flex flex-column align-items-center"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            <i class="fas fa-user-circle fa-lg"></i>
+                            <span class="icon-label text-nowrap">@firstName</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Index", "Profile")">
+                                    <i class="fas fa-user me-2"></i> My Account
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Orders", "Profile")">
+                                    <i class="fas fa-box me-2"></i> My Orders
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <form asp-controller="Login" asp-action="Logout" method="post" class="dropdown-item p-0 m-0">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-link text-start w-100 p-2" style="color: inherit;">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Sign Out
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Wishlist -->
+                    <a class="nav-icon d-flex flex-column align-items-center position-relative"
+                       href="@Url.Action("Index", "Favorites")" title="Wishlist">
+                        <i class="fas fa-heart"></i>
+                        @if (_ctx.Favorites.Count(f => f.UserId == userId) > 0)
+                        {
+                            <span class="badge">@_ctx.Favorites.Count(f => f.UserId == userId)</span>
+                        }
+                        <span class="icon-label">Wishlist</span>
+                    </a>
+
+                    <!-- Cart -->
+                    <a class="nav-icon d-flex flex-column align-items-center position-relative"
+                       href="@Url.Action("Index", "Cart")" title="Cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        @if (_ctx.CartItems.Count(c => c.UserId == userId) > 0)
+                        {
+                            <span class="badge">@_ctx.CartItems.Count(c => c.UserId == userId)</span>
+                        }
+                        <span class="icon-label">Cart</span>
+                    </a>
+                }
+
+                <!-- Dark Mode Toggle -->
+                <button id="themeToggle"
+                        class="btn btn-link nav-icon d-flex flex-column align-items-center p-0"
+                        title="Toggle Theme">
+                    <i id="themeIcon" class="fas fa-moon"></i>
+                    <span class="icon-label">Theme</span>
+                </button>
+            </div>
+
+        </div>
+    </nav>
+
+    @if (currentController == "Home"
+    && currentAction == "Index"
+    && !string.IsNullOrEmpty(firstName))
+    {
+        <div id="welcome-banner"
+             class="alert alert-success text-center mx-auto mb-4"
+             style="max-width: 600px;">
+            👋 Welcome back, <strong>@firstName</strong>!
+        </div>
+    }
+
+    <!-- MAIN CONTENT -->
+    <div class="content-wrap">
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <!-- STICKY FOOTER -->
+    <footer class="site-footer text-center">
+        <div class="container">
+            <small class="text-muted">
+                &copy; @DateTime.Now.Year &ndash; Owl_Gallery
+            </small>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/js/search.js" asp-append-version="true"></script>
+    <script src="~/js/animations.js" asp-append-version="true"></script>
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <!-- SweetAlert2 and Toastify libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        (function(){
+          /* ── Theme toggle ── */
+          const body = document.body;
+          const btn  = document.getElementById("themeToggle");
+          const icon = document.getElementById("themeIcon");
+          const key  = "site-theme";
+          let theme = localStorage.getItem(key) || "light";
+          function apply(t){
+            if(t==="dark"){
+              body.classList.add("dark-mode");
+              icon.className = "fas fa-sun";
+            } else {
+              body.classList.remove("dark-mode");
+              icon.className = "fas fa-moon";
+            }
+          }
+          apply(theme);
+          btn?.addEventListener("click", () => {
+            theme = body.classList.toggle("dark-mode") ? "dark" : "light";
+            localStorage.setItem(key, theme);
+            apply(theme);
+          });
+        })();
+
+        /* ── Hide navbar on scroll ── */
+        let lastScroll = 0;
+        const nav = document.querySelector(".navbar");
+        window.addEventListener("scroll", () => {
+          const st = window.scrollY || document.documentElement.scrollTop;
+          nav?.classList.toggle("navbar-hidden", st > lastScroll);
+          lastScroll = st <= 0 ? 0 : st;
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+          /* ── Welcome banner fade ── */
+          const b = document.getElementById("welcome-banner");
+          if (b) {
+            if (sessionStorage.getItem("welcomeShown")) {
+              b.remove();
+            } else {
+              sessionStorage.setItem("welcomeShown","true");
+              setTimeout(() => {
+                b.style.transition = "opacity .5s ease-out";
+                b.style.opacity = "0";
+                b.addEventListener("transitionend", () => b.remove());
+              }, 5000);
+            }
+          }
+
+          /* ── SweetAlert2 delete confirmation ── */
+          document.querySelectorAll(".btn-delete").forEach(btn => {
+            btn.addEventListener("click", e => {
+              e.preventDefault();
+              const form = btn.closest("form");
+              Swal.fire({
+                title: "Are you sure?",
+                text: "This action cannot be undone!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+              }).then(result => {
+                if (result.isConfirmed) form.submit();
+              });
+            });
+          });
+
+          /* ── Toastify for TempData messages ── */
+          var successMsg = @Html.Raw(JsonConvert.SerializeObject(TempData["Success"]));
+          var errorMsg   = @Html.Raw(JsonConvert.SerializeObject(TempData["Error"]));
+
+          if (successMsg) {
+            Toastify({
+              text: successMsg,
+              duration: 1500,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#4CAF50",
+              stopOnFocus: true,
+              style: { borderRadius:"8px", fontSize:"14px" }
+            }).showToast();
+          }
+          if (errorMsg) {
+            Toastify({
+              text: errorMsg,
+              duration: 1500,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#D32F2F",
+              stopOnFocus: true,
+              style: { borderRadius:"8px", fontSize:"14px" }
+            }).showToast();
+          }
+        });
+    </script>
+</body>
+</html>

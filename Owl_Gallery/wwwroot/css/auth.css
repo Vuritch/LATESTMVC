@@ -1,0 +1,205 @@
+﻿/* — Owl Purple palette — */
+:root {
+    --owl-purple: #5d16c1;
+    --owl-purple-dark: #38158d;
+    --owl-purple-light: #efe7ff;
+    --owl-gray: #e9ecef;
+    --owl-text: #222;
+}
+
+/* =========== Card =========== */
+.auth-card {
+    width: 100%;
+    max-width: 480px;
+    margin: 5rem auto 3rem;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 16px 48px rgba(0,0,0,.12);
+    overflow: hidden;
+    animation: fadeIn .5s ease-out both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(24px)
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+/* =========== Tabs =========== */
+.auth-tabs {
+    display: flex;
+    position: relative;
+    border-bottom: 1px solid var(--owl-gray)
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 1rem 0;
+    text-align: center;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    user-select: none
+}
+
+    .auth-tab.active {
+        color: var(--owl-purple-dark)
+    }
+
+.tab-slider {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50%;
+    height: 3px;
+    background: var(--owl-purple);
+    transition: transform .25s;
+}
+
+/* =========== Body =========== */
+.auth-body {
+    padding: 2.5rem 2rem;
+    color: var(--owl-text)
+}
+
+    .auth-body h2 {
+        text-align: center;
+        font-weight: 700;
+        color: var(--owl-purple-dark)
+    }
+
+    .auth-body .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 2rem;
+        font-size: .95rem
+    }
+
+/* =========== Floating label inputs =========== */
+.form-group {
+    position: relative;
+    margin-bottom: 1.4rem
+}
+
+    .form-group input {
+        width: 100%;
+        padding: 1.05rem .85rem .4rem;
+        font-size: 1rem;
+        border: 1.7px solid var(--owl-gray);
+        border-radius: 8px;
+        background: transparent;
+        transition: border .25s,box-shadow .25s;
+    }
+
+        .form-group input:focus {
+            border-color: var(--owl-purple);
+            box-shadow: 0 0 0 3px var(--owl-purple-light);
+            outline: none;
+        }
+
+    .form-group label {
+        position: absolute;
+        left: .85rem;
+        top: 1.05rem;
+        color: #777;
+        font-size: 1rem;
+        transition: .2s;
+        pointer-events: none;
+    }
+
+    .form-group input:focus + label,
+    .form-group input:not(:placeholder-shown) + label {
+        top: -.60rem;
+        font-size: .8rem;
+        background: #fff;
+        padding: 0 .35rem;
+        color: var(--owl-purple-dark)
+    }
+
+/* underline (for your old markup) */
+.underline {
+    position: absolute;
+    left: 50%;
+    bottom: -2px;
+    width: 0;
+    height: 2px;
+    background: var(--owl-purple);
+    transition: width .25s,left .25s;
+}
+
+.form-group input:focus ~ .underline {
+    width: 100%;
+    left: 0
+}
+
+/* =========== Purple button with ripple =========== */
+.btn-animate {
+    position: relative;
+    width: 100%;
+    padding: .8rem;
+    background: var(--owl-purple);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: background .25s;
+}
+
+    .btn-animate:hover {
+        background: var(--owl-purple-dark)
+    }
+
+    .btn-animate .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,.7);
+        transform: scale(0);
+        animation: rip .6s linear;
+        pointer-events: none
+    }
+
+@keyframes rip {
+    to {
+        transform: scale(12);
+        opacity: 0
+    }
+}
+.is-valid {
+    border-color: #27a844 !important
+}
+
+.is-invalid {
+    border-color: #e3342f !important
+}
+
+/* rule colours (green/red handled by class in JS) */
+.rule-ok {
+    color: #27a844
+}
+
+.rule-bad {
+    color: #e3342f
+}
+
+
+/* switch link */
+.switch-link {
+    text-align: center;
+    margin-top: 1rem
+}
+
+    .switch-link a {
+        color: var(--owl-purple-dark);
+        font-weight: 600;
+        text-decoration: none
+    }
+
+        .switch-link a:hover {
+            color: var(--owl-purple)
+        }

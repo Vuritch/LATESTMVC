@@ -1,0 +1,147 @@
+﻿@model IEnumerable<Owl_Gallery.Models.Product>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "My Favorites";
+}
+
+<section class="favorites-section">
+    <div class="container">
+        <h1 class="section-title text-center mb-5 animate__animated animate__fadeInDown">
+            💖 My Favorite Products
+        </h1>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info text-center shadow-sm p-4 rounded animate__animated animate__fadeIn">
+                <p class="mb-1">You haven’t added any favorites yet.</p>
+                <a asp-controller="Products" asp-action="Products"
+                   class="btn btn-outline-fav mt-3 animate__animated animate__fadeInUp">
+                    Browse Products
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var item in Model.Select((prod, idx) => new { prod, idx }))
+                {
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="card product-card shadow-sm h-100 animate__animated animate__zoomIn"
+                             style="animation-delay:@(item.idx * 80)ms">
+                            <div class="position-relative overflow-hidden">
+                                <img src="@item.prod.ImageUrl"
+                                     class="card-img-top"
+                                     alt="@item.prod.Name"
+                                     style="object-fit:cover;height:230px;width:100%" />
+                                <span class="badge bg-fav position-absolute top-0 start-0 m-2 px-3 py-2 rounded-pill">
+                                    <i class="fas fa-heart text-white"></i> Favorite
+                                </span>
+                            </div>
+                            <div class="card-body d-flex flex-column p-3">
+                                <h5 class="card-title text-dark text-truncate">@item.prod.Name</h5>
+                                <p class="price-tag mb-3">EGP @Math.Round(item.prod.Price)</p>
+                                <div class="mt-auto d-grid gap-2">
+                                    <form asp-controller="Favorites" asp-action="Remove" method="post" class="d-grid">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@item.prod.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                            <i class="fas fa-heart-broken me-1"></i> Remove
+                                        </button>
+                                    </form>
+                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.prod.Id"
+                                       class="btn btn-sm btn-owl w-100">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<style>
+    /* push below fixed navbar */
+    .favorites-section {
+        padding: 6rem 0 3rem;
+        background: #f9f5ff;
+    }
+
+    /* Section title underline */
+    .section-title {
+        display: inline-block;
+        font-size: 2.5rem;
+        font-weight: 700;
+        position: relative;
+        color: #5d16c1;
+    }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 4px;
+            background: #7648ff;
+            border-radius: 2px;
+        }
+
+    /* Light‐red badge for favorites */
+    .bg-fav {
+        background-color: #e3342f !important;
+    }
+
+    /* Card hover lift & animation pacing */
+    .product-card {
+        border-radius: 1rem;
+        overflow: hidden;
+        transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+        }
+
+    /* Price styling */
+    .price-tag {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Owl‐gradient “View Details” button */
+    .btn-owl {
+        background: linear-gradient(135deg,#7648ff 0%,#5d2dff 50%,#4a1dfc 100%);
+        color: #fff;
+        font-size: .9rem;
+        padding: .5rem 0;
+        border-radius: .5rem;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .btn-owl:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(91,48,255,.35);
+        }
+
+    /* Outline‐red “Browse Products” button */
+    .btn-outline-fav {
+        color: #ff6b6b;
+        border: 2px solid #ff6b6b;
+        font-size: .9rem;
+        padding: .5rem 1rem;
+        border-radius: .5rem;
+        transition: background .2s ease, color .2s ease;
+    }
+
+        .btn-outline-fav:hover {
+            background: #ff6b6b;
+            color: #fff;
+        }
+</style>

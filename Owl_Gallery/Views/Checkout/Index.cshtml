@@ -1,0 +1,442 @@
+﻿@model Owl_Gallery.ViewModels.CheckoutViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Secure Checkout";
+}
+
+<div class="container checkout-container my-5">
+    <div class="row gx-4">
+        <!-- LEFT: FORM + STEPS -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white text-center py-3">
+                    <h2 class="fw-bold text-owl-purple mb-2">Secure Checkout</h2>
+                    <ul class="stepper d-flex justify-content-between position-relative px-3 mb-0">
+                        <li class="step flex-fill text-center active" data-step="0">1. Shipping</li>
+                        <li class="step flex-fill text-center disabled" data-step="1">2. Payment</li>
+                        <li class="step flex-fill text-center disabled" data-step="2">3. Review</li>
+                        <div class="step-line"></div>
+                    </ul>
+                </div>
+
+                <div class="card-body p-4">
+                    <div id="stepValidationSummary" class="alert alert-danger d-none text-center"></div>
+
+                    <form id="checkoutForm" asp-action="PlaceOrder" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <!-- STEP 1: SHIPPING -->
+                        <div class="step-pane" data-step="0">
+                            <h5 class="text-owl-purple mb-4">Shipping Information</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6 form-floating">
+                                    <input asp-for="Shipping.FirstName"
+                                           class="form-control form-control-lg"
+                                           placeholder=" " required />
+                                    <label asp-for="Shipping.FirstName">First Name</label>
+                                    <span asp-validation-for="Shipping.FirstName" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 form-floating">
+                                    <input asp-for="Shipping.LastName"
+                                           class="form-control form-control-lg"
+                                           placeholder=" " required />
+                                    <label asp-for="Shipping.LastName">Last Name</label>
+                                    <span asp-validation-for="Shipping.LastName" class="text-danger small"></span>
+                                </div>
+                                <div class="col-12 form-floating">
+                                    <input asp-for="Shipping.Address1"
+                                           class="form-control form-control-lg"
+                                           placeholder=" " required />
+                                    <label asp-for="Shipping.Address1">Address Line 1</label>
+                                    <span asp-validation-for="Shipping.Address1" class="text-danger small"></span>
+                                </div>
+                                <div class="col-12 form-floating">
+                                    <input asp-for="Shipping.Address2"
+                                           class="form-control form-control-lg"
+                                           placeholder=" " required />
+                                    <label asp-for="Shipping.Address2">Address Line 2</label>
+                                    <span asp-validation-for="Shipping.Address2" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-4 form-floating">
+                                    <input asp-for="Shipping.City"
+                                           class="form-control"
+                                           placeholder=" " required />
+                                    <label asp-for="Shipping.City">City</label>
+                                    <span asp-validation-for="Shipping.City" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-4 form-floating">
+                                    <input asp-for="Shipping.State"
+                                           class="form-control"
+                                           placeholder=" " required />
+                                    <label asp-for="Shipping.State">State</label>
+                                    <span asp-validation-for="Shipping.State" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-4 form-floating">
+                                    <input asp-for="Shipping.PostalCode"
+                                           class="form-control"
+                                           placeholder=" " required />
+                                    <label asp-for="Shipping.PostalCode">Postal Code</label>
+                                    <span asp-validation-for="Shipping.PostalCode" class="text-danger small"></span>
+                                </div>
+                                <div class="col-12 form-floating">
+                                    <input asp-for="Shipping.Country"
+                                           class="form-control"
+                                           placeholder=" " required />
+                                    <label asp-for="Shipping.Country">Country</label>
+                                    <span asp-validation-for="Shipping.Country" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary btn-lg prevBtn" disabled>← Back</button>
+                                <button type="button" class="btn btn-owl btn-lg nextBtn">Next →</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2: PAYMENT -->
+                        <div class="step-pane d-none" data-step="1">
+                            <h5 class="text-owl-purple mb-4">Payment Details</h5>
+
+                            <!-- Card Preview -->
+                            <div class="card card-preview mb-4 p-4">
+                                <div class="card-body">
+                                    <div class="cc-number mb-3">
+                                        <span id="ccNumPreview">•••• •••• •••• ••••</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="cc-name"><small id="ccNamePreview">FULL NAME</small></div>
+                                        <div class="cc-exp"><small id="ccExpPreview">MM/YY</small></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Payment.CardName"
+                                       id="cardName"
+                                       class="form-control form-control-lg"
+                                       placeholder=" "
+                                       required />
+                                <label for="cardName">Name on Card</label>
+                                <span asp-validation-for="Payment.CardName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-floating mb-3 position-relative">
+                                <input asp-for="Payment.CardNumber"
+                                       id="cardNumber"
+                                       class="form-control form-control-lg ps-5"
+                                       placeholder=" "
+                                       maxlength="19"
+                                       pattern="\d{4}\s?\d{4}\s?\d{4}\s?\d{4}"
+                                       title="Enter 16 digits, spaces allowed"
+                                       required />
+                                <label for="cardNumber">Card Number</label>
+                                <span asp-validation-for="Payment.CardNumber" class="text-danger small"></span>
+                                <small id="cardCount" class="form-text text-muted">0 / 16</small>
+                                <div class="position-absolute top-50 start-0 translate-middle-y ps-3">
+                                    <i id="card-icon" class="far fa-credit-card fs-4 text-muted"></i>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6 form-floating">
+                                    <input asp-for="Payment.Expiry"
+                                           id="expiry"
+                                           class="form-control form-control-lg"
+                                           placeholder=" "
+                                           maxlength="5"
+                                           required />
+                                    <label for="expiry">Expiry (MM/YY)</label>
+                                    <span asp-validation-for="Payment.Expiry" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 form-floating">
+                                    <input asp-for="Payment.Cvc"
+                                           id="cvc"
+                                           class="form-control form-control-lg"
+                                           placeholder=" "
+                                           maxlength="3"
+                                           required />
+                                    <label for="cvc">CVC</label>
+                                    <span asp-validation-for="Payment.Cvc" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary btn-lg prevBtn">← Back</button>
+                                <button type="button" class="btn btn-owl btn-lg nextBtn">Next →</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: REVIEW -->
+                        <div class="step-pane d-none" data-step="2">
+                            <h5 class="text-owl-purple mb-4">Review & Confirm</h5>
+                            <div class="order-preview mb-4">
+                                @foreach (var item in Model.CartItems)
+                                {
+                                    <div class="d-flex align-items-center py-2 border-bottom review-row">
+                                        <img src="@item.Product.ImageUrl"
+                                             alt="@item.ProductName"
+                                             class="review-img rounded me-3" />
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold">@item.Product.Name</div>
+                                            <div class="text-muted small">Qty: @item.Quantity</div>
+                                        </div>
+                                        <div class="fw-semibold">
+                                            EGP @item.Product.Price.ToString("F2")
+                                            × @item.Quantity
+                                            = <strong>EGP @((item.Product.Price * item.Quantity).ToString("F2"))</strong>
+                                        </div>
+                                    </div>
+                                }
+                                <div class="d-flex justify-content-between pt-3 fw-bold fs-5">
+                                    <span>Total</span>
+                                    <span>EGP @Model.Total.ToString("F2")</span>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary btn-lg prevBtn">← Back</button>
+                                <button type="submit" class="btn btn-success btn-lg">Place Order</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: ORDER SUMMARY -->
+        <div class="col-lg-4 d-none d-lg-block">
+            <div class="card summary-card shadow-sm p-3 sticky-top">
+                <h5 class="fw-bold mb-3">Order Summary</h5>
+                @foreach (var item in Model.CartItems)
+                {
+                    <div class="d-flex justify-content-between">
+                        <small>@item.Product.Name × @item.Quantity</small>
+                        <small>EGP @((item.Product.Price * item.Quantity).ToString("F2"))</small>
+                    </div>
+                }
+                <hr />
+                <div class="d-flex justify-content-between fw-bold">
+                    <span>Total</span>
+                    <span>EGP @Model.Total.ToString("F2")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const steps     = document.querySelectorAll(".stepper .step");
+          const panes     = document.querySelectorAll(".step-pane");
+          const summary   = document.getElementById("stepValidationSummary");
+          const cardNum   = document.getElementById("cardNumber");
+          const cardIcon  = document.getElementById("card-icon");
+          const cardCount = document.getElementById("cardCount");
+          const nameInput = document.getElementById("cardName");
+          const expInput  = document.getElementById("expiry");
+          let   current   = 0;
+
+          function showStep(i) {
+            panes.forEach((p,idx)=> p.classList.toggle("d-none", idx!==i));
+            steps.forEach((s,idx)=>{
+              s.classList.toggle("active",    idx===i);
+              s.classList.toggle("completed", idx< i);
+              s.classList.toggle("disabled",  idx> i);
+            });
+            summary.classList.add("d-none");
+            document.querySelectorAll(".prevBtn")[i].disabled = (i===0);
+          }
+
+          function maskCard() {
+            const raw = cardNum.value.replace(/\D/g,"").slice(0,16);
+            const grp = raw.match(/.{1,4}/g);
+            cardNum.value = grp ? grp.join(" ") : raw;
+            cardCount.textContent = `${raw.length} / 16`;
+            // brand icon
+            if    (/^4/.test(raw))           cardIcon.className = "fab fa-cc-visa";
+            else if (/^5[1-5]/.test(raw))    cardIcon.className = "fab fa-cc-mastercard";
+            else if (/^3[47]/.test(raw))     cardIcon.className = "fab fa-cc-amex";
+            else                              cardIcon.className = "far fa-credit-card";
+            // preview text
+            document.getElementById("ccNumPreview").textContent = raw
+              .padEnd(16, "•")
+              .match(/.{1,4}/g)
+              ?.join(" ") ?? "•••• •••• •••• ••••";
+          }
+
+          function updatePreview() {
+            document.getElementById("ccNamePreview").textContent =
+              nameInput.value.toUpperCase() || "FULL NAME";
+            document.getElementById("ccExpPreview").textContent  =
+              expInput.value || "MM/YY";
+          }
+
+          function validExpiry(v) {
+            if(!/^\d{2}\/\d{2}$/.test(v)) return false;
+            const [m,y] = v.split("/").map(Number),
+                  now   = new Date(),
+                  cy    = +now.getFullYear().toString().slice(-2),
+                  cm    = now.getMonth()+1;
+            return m>=1 && m<=12 && (y>cy || (y===cy && m>=cm));
+          }
+
+          // Next / Prev logic
+          document.querySelectorAll(".nextBtn").forEach(btn=>
+            btn.addEventListener("click", () => {
+              const fields = panes[current].querySelectorAll("input[required]");
+              for(let f of fields) if(!f.checkValidity()) { f.reportValidity(); return; }
+              if(current===1){
+                if(cardNum.value.replace(/\D/g,"").length < 16){
+                  summary.textContent="Card number must be 16 digits.";
+                  summary.classList.remove("d-none"); return;
+                }
+                if(!validExpiry(expInput.value)){
+                  summary.textContent="Invalid expiry (MM/YY).";
+                  summary.classList.remove("d-none"); return;
+                }
+              }
+              if(current < panes.length-1) showStep(++current);
+            })
+          );
+          document.querySelectorAll(".prevBtn").forEach(btn=>
+            btn.addEventListener("click", ()=> showStep(--current))
+          );
+
+          // mask & preview
+          cardNum.addEventListener("input", ()=>{ maskCard(); updatePreview(); });
+          nameInput.addEventListener("input",  updatePreview);
+          expInput.addEventListener("input",   updatePreview);
+
+          // submit cleanup
+          document.getElementById("checkoutForm")
+            .addEventListener("submit", () => cardNum.value = cardNum.value.replace(/\D/g,""));
+
+          showStep(0);
+        });
+    </script>
+}
+
+<style>
+    :root {
+        --owl-purple: #5d16c1;
+        --owl-light: rgba(93,22,193,.15);
+    }
+
+    .checkout-container {
+        max-width: 960px;
+    }
+
+    .text-owl-purple {
+        color: var(--owl-purple);
+    }
+
+    .btn-owl {
+        background: var(--owl-purple);
+        color: #fff;
+        border-radius: 2rem;
+        padding: .7rem 2rem;
+        transition: .3s ease;
+    }
+
+        .btn-owl:hover {
+            background: #4a0fb2;
+            transform: translateY(-2px);
+        }
+
+    .form-floating > .form-control {
+        padding: 1.25rem .75rem .5rem;
+    }
+
+    .form-floating > label {
+        top: .25rem;
+        left: .75rem;
+        transform-origin: left top;
+        transition: .2s;
+    }
+
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: var(--owl-purple);
+        transform: translateY(-.75rem) scale(.85);
+    }
+
+    .stepper {
+        position: relative;
+        margin-bottom: 2rem;
+        list-style: none;
+        padding: 0;
+    }
+
+    .step {
+        background: #f0f0f0;
+        color: #666;
+        padding: .6rem 0;
+        font-weight: 600;
+        border-radius: 2rem;
+        cursor: pointer;
+        transition: .3s;
+        z-index: 1;
+    }
+
+        .step.active {
+            background: var(--owl-purple);
+            color: #fff;
+        }
+
+        .step.completed {
+            background: #e5dbfc;
+            color: var(--owl-purple);
+        }
+
+        .step.disabled {
+            opacity: .6;
+            pointer-events: none;
+        }
+
+    .step-line {
+        position: absolute;
+        top: 50%;
+        left: 10%;
+        right: 10%;
+        height: 4px;
+        background: var(--owl-light);
+        z-index: 0;
+    }
+
+    .card-preview {
+        background: linear-gradient(135deg,#ecefff 0%,#d1c4ff 100%);
+        border-radius: .75rem;
+        font-family: monospace;
+    }
+
+        .card-preview .cc-number {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+    .review-row {
+        gap: .75rem;
+    }
+
+    .review-img {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+    }
+
+    .summary-card {
+        position: sticky;
+        top: 2rem;
+    }
+
+    .order-preview {
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: .5rem;
+    }
+
+    .form-control:focus {
+        border-color: var(--owl-purple);
+        box-shadow: 0 0 0 .2rem var(--owl-light);
+    }
+</style>

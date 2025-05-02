@@ -1,0 +1,27 @@
+﻿@model Owl_Gallery.ViewModels.VerifyCodeViewModel
+@{
+    ViewData["Title"] = "Verify Reset Code";
+}
+
+<div class="container py-5">
+    <h2 class="text-owl-purple">Verify Reset Code</h2>
+    <p>Please enter the 6-digit code sent to your email.</p>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form asp-action="Verify" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Email" />
+
+        <div class="form-group">
+            <label asp-for="Code"></label>
+            <input asp-for="Code" class="form-control" placeholder="Enter 6-digit code" />
+            <span asp-validation-for="Code" class="text-danger small"></span>
+        </div>
+
+        <button type="submit" class="btn btn-owl mt-3">Verify</button>
+    </form>
+</div>

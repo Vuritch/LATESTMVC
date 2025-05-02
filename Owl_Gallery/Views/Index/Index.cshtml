@@ -1,0 +1,628 @@
+﻿@model Owl_Gallery.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+@* ----------  HERO SECTION  ---------- *@
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="display-1 fw-bold mb-4">Discover Unique Accessories</h1>
+        <p class="lead fs-3 mb-5 animate-fade-in delay-200">
+            Express your style with our handcrafted collection
+        </p>
+
+        <!-- 🔗 edit the Url.Action target if your route differs -->
+        <a asp-controller="Products" asp-action="Products"
+           class="btn btn-owl btn-lg px-5 animate-fade-in delay-400">
+            Shop Now
+        </a>
+    </div>
+</section>
+
+<style>
+    /* ------------- HERO (lightened) ------------- */
+    /* HERO  – lighter, slightly blurred backdrop */
+    .hero-section {
+        height: 100vh;
+        background: url("/images/gg.jpg") center/cover no-repeat fixed;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #fff;
+    }
+
+        /* ↓ LOWER opacity: 0.25 → 0.45 instead of 0.45 → 0.70 */
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( rgba(93,22,193,.25) 0%, /* 25 % purple at top  */
+            rgba(32,24,60,.45) 100% /* 45 % near-black bottom */
+            );
+            /*-- optional – small backdrop-blur to soften photo through overlay --*/
+            backdrop-filter: blur(2px);
+            mix-blend-mode: multiply;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* remove any accidental second overlay */
+        .hero-section::after {
+            content: none !important;
+        }
+
+
+        /* colour wash – lighter purple & more transparent */
+        .hero-section::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( rgba(93,22,193,.35) 0%, /* 35 % at top  (was 55 %) */
+            rgba(32,24,60,.60) 100%); /* 60 % bottom  (was 85 %) */
+            mix-blend-mode: multiply;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+    /* keep all text above overlay */
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+        padding: 0 24px
+    }
+
+        /* optional – make sure headings are present & centred */
+        .hero-content h1 {
+            font-size: clamp(2.5rem,6vw,4.5rem);
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+
+
+    /* ============================  CTA BUTTON  ====================== */
+    .btn-owl {
+        /* opaque gradient so the background never shows through */
+        background: linear-gradient(135deg,#7648ff 0%,#5d2dff 50%,#4a1dfc 100%);
+        color: #fff;
+        border: none;
+        border-radius: 3rem;
+        padding: .9rem 3rem;
+        font-weight: 600;
+        letter-spacing: .5px;
+        box-shadow: 0 6px 18px rgba(91,48,255,.35);
+        transition: transform .25s ease,box-shadow .25s ease;
+    }
+
+        /* brighter & lifted on hover / focus */
+        .btn-owl:hover,
+        .btn-owl:focus {
+            background: linear-gradient(135deg,#9b74ff 0%,#7648ff 50%,#5d2dff 100%);
+            box-shadow: 0 10px 28px rgba(91,48,255,.45);
+            transform: translateY(-3px);
+            color: #fff; /* keep type white for contrast */
+        }
+
+        /* optional: active click feedback */
+        .btn-owl:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 14px rgba(91,48,255,.35);
+        }
+
+        /* optional soft pulse */
+        .btn-owl::after {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            background: inherit;
+            filter: blur(12px);
+            opacity: .55;
+            z-index: -1;
+            animation: btnPulse 2.8s ease-in-out infinite;
+        }
+        @@keyframes btnPulse {
+        0%,100%
+
+    {
+        opacity: .55;
+        transform: scale(.96)
+    }
+
+    50% {
+        opacity: .9;
+        transform: scale(1.04)
+    }
+
+    }
+</style>
+
+<section class="testimonials-section py-6 bg-white">
+    <div class="container">
+        +  <h2 class="section-title text-center mx-auto">What Our Customers Say</h2>
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <blockquote class="blockquote text-center">
+                        <p class="mb-4">“These handcrafted pieces are absolutely stunning—I've never had so many compliments!”</p>
+                        <footer class="blockquote-footer">Jessica R., <cite title="Company">NYC</cite></footer>
+                    </blockquote>
+                </div>
+                <div class="carousel-item">
+                    <blockquote class="blockquote text-center">
+                        <p class="mb-4">“Fast shipping, incredible quality. Owl Gallery truly delivers luxury.”</p>
+                        <footer class="blockquote-footer">David L., <cite title="Company">LA</cite></footer>
+                    </blockquote>
+                </div>
+                <!-- add more .carousel-item blocks as needed -->
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                <i class="fas fa-chevron-left fa-2x text-secondary"></i>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                <i class="fas fa-chevron-right fa-2x text-secondary"></i>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+
+<!-- FEATURED PRODUCTS -->
+<section class="featured-products py-6">
+    <div class="container">
+        <h2 class="text-center mb-5 display-4 reveal">Featured Products</h2>
+        <div class="row g-5">
+            <!-- Hardcoded Featured Product Cards -->
+            <div class="col-md-3 reveal-up">
+                <div class="luxury-card">
+                    <div class="luxury-card-img">
+                        <img src="~/images/Necklace4.jpg" alt="Chain Necklace">
+                    </div>
+                    <div class="luxury-card-body">
+                        <h5>Chain Necklace</h5>
+                        <p>EGP 200.00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 reveal-up delay-100">
+                <div class="luxury-card">
+                    <div class="luxury-card-img">
+                        <img src="~/images/Ring1.jpg" alt="Leaf Cuffed Ring">
+                    </div>
+                    <div class="luxury-card-body">
+                        <h5>Leaf Cuffed Ring</h5>
+                        <p>EGP 250.00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 reveal-up delay-100">
+                <div class="luxury-card">
+                    <div class="luxury-card-img">
+                        <img src="~/images/Bracelet3.jpg" alt="3pcs Gold Plated Bracelets">
+                    </div>
+                    <div class="luxury-card-body">
+                        <h5>3pcs Gold Plated Bracelets</h5>
+                        <p>EGP 300.00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 reveal-up delay-100">
+                <div class="luxury-card">
+                    <div class="luxury-card-img">
+                        <img src="~/images/Earrings4.jpg" alt="Leaf Earrings">
+                    </div>
+                    <div class="luxury-card-body">
+                        <h5>Leaf Earrings</h5>
+                        <p>EGP 180.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TRENDING NOW -->
+@using System.Linq 
+<section class="trending-carousel bg-dark text-white py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">🔥 Trending Now</h2>
+
+
+        @if (Model?.TrendingProducts != null && Model.TrendingProducts.Any())  
+        {
+            <div id="trendingCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                <div class="carousel-inner">
+                    @for (int i = 0; i < Model.TrendingProducts.Count; i++)
+                    {
+                        var product = Model.TrendingProducts[i];
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <div class="d-flex justify-content-center">
+                                <a href="@Url.Action("Product", "Product", new { id = product.Id })" class="text-decoration-none">
+                                    <div class="luxury-card text-center">
+                                        <div class="luxury-card-img">
+                                            <img src="@product.ImageUrl" class="d-block img-fluid rounded" alt="Trending @product.Name">
+                                        </div>
+                                        <div class="luxury-card-body d-flex flex-column align-items-center">
+                                            <h5 class="product-name mb-1">@product.Name</h5>
+                                            <p class="product-price mb-0">EGP @product.Price</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <ol class="carousel-indicators">
+                    @for (int i = 0; i < Model.TrendingProducts.Count; i++)
+                    {
+                        <li data-bs-target="#trendingCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></li>
+                    }
+                </ol>
+
+                <a class="carousel-control-prev" href="#trendingCarousel" role="button" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </a>
+                <a class="carousel-control-next" href="#trendingCarousel" role="button" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </a>
+            </div>
+        }
+        else
+        {
+            <p class="text-center">No trending products available.</p>
+        }
+    </div>
+</section>
+
+
+<!-- BEST SELLERS -->
+<section class="best-sellers py-6">
+    <div class="container">
+        <h2 class="text-center mb-5 display-4">Best Sellers</h2>
+
+        @if (Model?.BestSellers != null && Model.BestSellers.Any())
+        {
+            <div class="row">
+                @foreach (var product in Model.BestSellers)
+                {
+                    <div class="col-md-4 mb-4">
+                        <a href="@Url.Action("Product", "Product", new { id = product.Id })" class="text-decoration-none">
+                            <div class="card">
+                                <img src="@product.ImageUrl" class="card-img-top rounded-3" style="height: 300px; object-fit: cover;" alt="@product.Name">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">@product.Name</h5>
+                                    <p class="card-text" style="color: #c08497; font-size: 1.25rem;">EGP @product.Price</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center">No best-selling products at this time.</p>
+        }
+    </div>
+</section>
+
+<!-- NEWSLETTER – glass card on soft-light background -->
+<section class="newsletter-section position-relative overflow-hidden py-6">
+    <!-- sparkle canvas -->
+    <canvas id="sparkleCanvas" class="position-absolute top-0 start-0 w-100 h-100"></canvas>
+
+    <div class="container position-relative z-2">
+        <div class="newsletter-card mx-auto px-4 px-sm-5 py-5 text-center glass shadow-lg">
+            <h2 class="display-5 fw-semibold mb-3 reveal">Stay Updated</h2>
+            <p class="fs-5 mb-5">Get exclusive deals &amp; early access to new drops ✨</p>
+
+            <form id="newsletterForm" class="row g-0 justify-content-center reveal-up needs-validation" novalidate>
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="input-group newsletter-input-group">
+                        <input type="email"
+                               id="emailInput"
+                               class="form-control form-control-lg"
+                               placeholder="you@example.com"
+                               required>
+                        <button id="subscribeBtn"
+                                type="submit"
+                                class="btn btn-purple-gradient btn-lg px-4 d-flex align-items-center">
+                            <span id="spinner" class="spinner-border spinner-border-sm me-2 d-none"></span>
+                            <span id="btnText">Subscribe</span>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback text-start ps-2">
+                        Please enter a valid email.
+                    </div>
+                </div>
+            </form>
+
+            <div id="alertMessage" class="mt-4"></div>
+        </div>
+    </div>
+</section>
+
+
+<style>
+    /* === Hero CTA – luxe gradient & glow === */
+    /* HERO — full-bleed photo + single translucent wash  */
+    .hero-section {
+        height: 100vh;
+        background: url("/images/gg.jpg") center/cover no-repeat;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #fff;
+    }
+    .hero-section::before{
+    background:linear-gradient(
+        135deg,
+        rgba(71,12,126,.70) 0%,
+        rgba(130,32,221,.40) 100%
+    );
+    z-index:1;
+}
+        /* ONE overlay - 60 % purple at the top, 85 % near-black at the bottom */
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( rgba(93,22,193,.60) 0%, rgba(32,24,60,.85) 100% );
+            mix-blend-mode: multiply; /* lets the photo’s highlights show through */
+            z-index: 0;
+        }
+
+    /* make sure the text & button sit above the overlay */
+    .hero-content,
+    .hero-text {
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-owl {
+        background: #6b2dff; /* solid purple instead of gradient */
+        border: none;
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(91,48,255,.35);
+        transition: transform .25s ease,box-shadow .25s ease;
+    }
+
+        .btn-owl:hover,
+        .btn-owl:focus {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(91,48,255,.45);
+        }
+
+    /* Stretch video / image */
+    .hero-bg-video,
+    .hero-gradient-overlay {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* “overlay” now transparent (no gradient wash) */
+    .hero-gradient-overlay {
+        position: absolute;
+        inset: 0;
+        background: transparent; /* <-- gradient removed */
+    }
+
+    /* ===== NAVBAR TINT (flat) ===== */
+    .bg-nav {
+        background: #e9e9f0; /* flat light grey */
+        transition: background .3s;
+        box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    }
+
+    body.dark-mode .bg-nav {
+        background: #1e1e26;
+    }
+
+    /* ----- Newsletter Section ----- */
+    /* Newsletter wrapper */
+    .btn-purple-gradient {
+        /* NEW: subtle indigo gradient */
+        background: linear-gradient(135deg, #5b6dff 0%, #475aff 50%, #303ab8 100%);
+    }
+
+        .btn-purple-gradient:hover {
+            background: #2930a8;
+            box-shadow: 0 10px 26px rgba(71,86,255,.45);
+        }
+    /* === Newsletter wrapper – SOFT LIGHT === */
+    .newsletter-section {
+        /* gentle vignette from almost-white to light grey */
+        background: radial-gradient(circle at 40% 10%, #ffffff 0%, #f4f5f7 35%, #e9eaee 65%, #d9dce2 100%);
+    }
+
+    .newsletter-card.glass {
+        backdrop-filter: blur(12px) saturate(140%);
+        background: rgba(255,255,255,0.65); /* translucent white */
+        border: 1px solid rgba(0,0,0,0.08); /* faint outline     */
+        border-radius: 1.5rem;
+        color: #3a3a3a; /* dark text for a11y*/
+    }
+
+
+
+
+
+    .newsletter-input-group {
+        box-shadow: 0 6px 18px rgba(0,0,0,.08); /* softer shadow */
+    }
+
+
+    .newsletter-card.glass h2 {
+        color: #5419a6; /* keep headline on-brand purple*/
+    }
+
+    .newsletter-card.glass p {
+        color: #6b6b6b; /* medium-dark grey for subline */
+    }
+
+    /* input text + placeholder */
+    .newsletter-input-group .form-control {
+        color: #3a3a3a;
+    }
+
+        .newsletter-input-group .form-control::placeholder {
+            color: #9aa1b4;
+        }
+
+            .newsletter-input-group .form-control:focus {
+                box-shadow: none;
+            }
+
+    .btn-purple-gradient { /* rename if you wish */
+        background: linear-gradient(135deg, #d3d6dd 0%, #b1b5c0 50%, #8c909e 100%);
+        color: #1d1e20;
+    }
+
+        .btn-purple-gradient:hover {
+            background: #787d8c;
+            color: #fff;
+            box-shadow: 0 8px 22px rgba(0,0,0,.18);
+        }
+
+
+
+        .btn-purple-gradient:disabled {
+            opacity: .75;
+            cursor: not-allowed;
+        }
+
+    /* Sparkle canvas sits under the glass card */
+    #sparkleCanvas {
+        pointer-events: none;
+        z-index: 1;
+        opacity: .25;
+    }
+
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const reveals = document.querySelectorAll('.reveal, .reveal-up');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+            reveals.forEach(el => revealObserver.observe(el));
+
+            
+
+            const newsletterForm = document.getElementById('newsletterForm');
+            const emailInput = document.getElementById('emailInput');
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            const spinner = document.getElementById('spinner');
+            const alertMessage = document.getElementById('alertMessage');
+
+            newsletterForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const email = emailInput.value.trim();
+                if (!email) {
+                    alertMessage.innerHTML = `<div class="alert alert-danger mt-3">❌ Please enter your email address.</div>`;
+                    return;
+                }
+                spinner.style.display = 'inline-block';
+                subscribeBtn.disabled = true;
+                alertMessage.innerHTML = '';
+                try {
+                    const response = await fetch('/Newsletter/Subscribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `email=${encodeURIComponent(email)}`
+                    });
+                    if (response.ok) {
+                        alertMessage.innerHTML = `<div class="alert alert-success mt-3">🎉 Thanks for subscribing! Check your inbox.</div>`;
+                        newsletterForm.reset();
+                    } else {
+                        alertMessage.innerHTML = `<div class="alert alert-danger mt-3">❌ Failed to subscribe. Try again.</div>`;
+                    }
+                } catch (error) {
+                    console.error('Newsletter Error:', error);
+                    alertMessage.innerHTML = `<div class="alert alert-danger mt-3">❌ An error occurred. Try later.</div>`;
+                } finally {
+                    spinner.style.display = 'none';
+                    subscribeBtn.disabled = false;
+                }
+            });
+        });
+                              (function(){
+          const c = document.getElementById('sparkleCanvas');
+          if (!c) return;
+          const ctx = c.getContext('2d');
+          let w, h, particles = [];
+
+          // resize canvas to full width, and height of its parent
+          function resize() {
+            w = c.width  = window.innerWidth;
+            h = c.height = c.parentNode.offsetHeight;
+          }
+
+          // initialize sparkle particles
+          function init() {
+            resize();
+            particles = [];
+            for (let i = 0; i < 80; i++) {
+              particles.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                r: Math.random() * 1.8 + 0.4,  // base radius
+                s: Math.random() * 0.8 + 0.2   // speed
+              });
+            }
+            requestAnimationFrame(loop);
+          }
+
+          // main animation loop
+          function loop() {
+            ctx.clearRect(0, 0, w, h);
+
+            particles.forEach(p => {
+              // move down
+              p.y += p.s;
+              if (p.y > h) p.y = 0;
+
+              // apply purple glow
+              ctx.shadowBlur  = p.r * 6;
+              ctx.shadowColor = 'rgba(180,120,255,0.6)';
+
+              // keep a decent minimum alpha
+              const alpha = Math.min(1, p.r * 0.4 + 0.4);
+
+              // draw the sparkle
+              ctx.fillStyle = `rgba(180,120,255,${alpha})`;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.r * 1.5, 0, Math.PI * 2);
+              ctx.fill();
+
+              // reset blur
+              ctx.shadowBlur = 0;
+            });
+
+            requestAnimationFrame(loop);
+          }
+
+          // re-size on window change
+          window.addEventListener('resize', resize);
+
+          // start
+          init();
+        })();
+    </script>
+}

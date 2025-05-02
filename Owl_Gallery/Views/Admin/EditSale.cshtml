@@ -1,0 +1,68 @@
+﻿@model Owl_Gallery.Models.Sale
+@{
+    ViewData["Title"] = "Edit Sale";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Edit Sale</h2>
+
+    <div class="card shadow p-4">
+        <form asp-action="EditSale" method="post">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <!-- Product Selection -->
+            <div class="mb-3">
+                <label asp-for="ProductId" class="form-label">Product</label>
+                <select asp-for="ProductId" class="form-select">
+                    <option value="">Select a product</option>
+                    @foreach (var product in ViewBag.Products as IEnumerable<Owl_Gallery.Models.Product>)
+                    {
+                        <option value="@product.Id" selected="@(product.Id == Model.ProductId)">
+                            @product.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="ProductId" class="text-danger"></span>
+            </div>
+
+            <!-- Sale Price -->
+            <div class="mb-3">
+                <label asp-for="SalePrice" class="form-label">Sale Price</label>
+                <input asp-for="SalePrice" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="SalePrice" class="text-danger"></span>
+            </div>
+
+            <!-- Discount Percentage -->
+            <div class="mb-3">
+                <label asp-for="DiscountPercentage" class="form-label">Discount Percentage</label>
+                <input asp-for="DiscountPercentage" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
+            </div>
+
+            <!-- Sale Start Date -->
+            <div class="mb-3">
+                <label asp-for="StartDate" class="form-label">Sale Start Date</label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+
+            <!-- Sale End Date -->
+            <div class="mb-3">
+                <label asp-for="EndDate" class="form-label">Sale End Date</label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Save Sale</button>
+                <a href="@Url.Action("ManageSales", "Admin")" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

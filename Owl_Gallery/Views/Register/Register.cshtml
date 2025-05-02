@@ -1,0 +1,82 @@
+﻿@model Owl_Gallery.Models.Register
+@{
+    ViewData["Title"] = "Register";
+    bool isLogin = false;
+}
+
+<div class="auth-card">
+
+    <!-- TAB BAR -->
+    <div class="auth-tabs">
+        <a class="auth-tab @(isLogin ? "active" : "")" href="@Url.Action("Login","Login")">Login</a>
+        <a class="auth-tab @(!isLogin ? "active" : "")" href="@Url.Action("Register","Register")">Register</a>
+        <div class="tab-slider" style="transform:translateX(@(isLogin?0:100)%);"></div>
+    </div>
+
+    <!-- BODY -->
+    <div class="auth-body">
+        <h2 class="auth-title">Create Account</h2>
+        <p class="subtitle">Join Owl Gallery to enjoy exclusive offers, easy order tracking, and a personalized shopping experience.</p>
+
+        <!-- ✅ Show messages if any -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+
+        <form asp-controller="Register" asp-action="Register" method="post" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <input asp-for="FirstName" placeholder=" " autocomplete="given-name" />
+                <label>First Name</label>
+            </div>
+
+            <div class="form-group">
+                <input asp-for="LastName" placeholder=" " autocomplete="family-name" />
+                <label>Last Name</label>
+            </div>
+
+            <div class="form-group">
+                <input asp-for="Email" type="email" placeholder=" " autocomplete="email" />
+                <label>Email address</label>
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="form-group">
+                <input asp-for="Password" id="registerPassword" type="password" placeholder=" " autocomplete="new-password" />
+                <label>Password</label>
+            </div>
+
+            <div id="strengthBox">
+                <div id="strengthBar"><span></span></div>
+                <ul class="rule-list">
+                    <li><i></i> At least 8 characters</li>
+                    <li><i></i> At least 1 uppercase letter</li>
+                    <li><i></i> At least 1 lowercase letter</li>
+                    <li><i></i> At least 1 number</li>
+                </ul>
+            </div>
+
+            <div class="form-group">
+                <input asp-for="ConfirmPassword" type="password" placeholder=" " autocomplete="new-password" />
+                <label>Confirm Password</label>
+            </div>
+
+            <button type="submit" class="btn-animate">Sign Up</button>
+        </form>
+
+        <p class="switch-link">
+            Already have an account?
+            <a href="@Url.Action("Login","Login")">Sign in</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

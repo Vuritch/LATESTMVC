@@ -1,0 +1,122 @@
+﻿@model Owl_Gallery.Models.LoginModel
+@{
+    ViewData["Title"] = "Login";
+    bool isLogin = true;
+}
+
+<div class="auth-card">
+
+    <!-- TAB BAR -->
+    <div class="auth-tabs">
+        <a class="auth-tab @(isLogin ? "active" : "")" href="@Url.Action("Login","Login")">Login</a>
+        <a class="auth-tab @(!isLogin ? "active" : "")" href="@Url.Action("Register","Register")">Register</a>
+
+        <!-- purple slider -->
+        <div class="tab-slider" style="transform:translateX(@(isLogin?0:100)%);"></div>
+    </div>
+
+    <!-- BODY -->
+    <div class="auth-body">
+        <h2 class="auth-title">Welcome Back</h2>
+
+        <!-- displays “Invalid e-mail or password.” -->
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <!-- Google Sign-in -->
+        <div class="mt-4 text-center">
+            <p class="text-muted mb-3">Or continue with</p>
+            <a class="btn btn-google w-100 d-flex align-items-center justify-content-center gap-2"
+               href="@Url.Action("GoogleLogin", "ExternalLogin")">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" width="20" height="20">
+                <span>Sign in with Google</span>
+            </a>
+        </div>
+        <style>
+            .btn-google {
+                background-color: white;
+                color: #555;
+                border: 1px solid #ddd;
+                padding: 0.6rem 1rem;
+                font-weight: 600;
+                border-radius: 0.5rem;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+                .btn-google:hover {
+                    background-color: #f7f7f7;
+                    border-color: #ccc;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                    text-decoration: none;
+                }
+
+                .btn-google img {
+                    margin-right: 0.5rem;
+                }
+        </style>
+
+
+        <div class="d-flex align-items-center my-4">
+            <hr class="flex-grow-1" />
+            <span class="px-2 small text-muted">OR</span>
+            <hr class="flex-grow-1" />
+        </div>
+
+        <!-- Normal Login Form -->
+        <form asp-controller="Login" asp-action="Login" method="post" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <input asp-for="Email" type="email" placeholder=" " autocomplete="username" />
+                <label>Email address</label>
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="form-group">
+                <input asp-for="Password" type="password" placeholder=" " autocomplete="current-password" />
+                <label>Password</label>
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <!-- Remember Me -->
+            <div class="form-check mb-3">
+                <input asp-for="RememberMe" class="form-check-input" id="rememberMeCheck" />
+                <label asp-for="RememberMe" class="form-check-label" for="rememberMeCheck">Remember me</label>
+            </div>
+
+            <button type="submit" class="btn-animate w-100">Log In</button>
+            <p class="text-end mt-2">
+                <a href="@Url.Action("Index", "ForgotPassword")" class="text-decoration-none small text-primary">
+                    Forgot your password?
+                </a>
+            </p>
+        </form>
+
+        <p class="switch-link mt-3">
+            Don’t have an account?
+            <a href="@Url.Action("Register","Register")">Sign up</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .btn-google {
+        background: white;
+        color: #444;
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: 0.3s;
+        padding: 0.5rem 1rem;
+    }
+
+        .btn-google:hover {
+            background: #f8f8f8;
+            border-color: #bbb;
+            color: #222;
+        }
+</style>
