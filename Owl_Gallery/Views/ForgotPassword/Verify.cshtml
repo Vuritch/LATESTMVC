@@ -1,0 +1,101 @@
+﻿@model Owl_Gallery.ViewModels.VerifyCodeViewModel
+@{
+    ViewData["Title"] = "Verify Reset Code";
+}
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<div class="container py-5" style="max-width:480px">
+    <h2 class="text-owl-purple mb-2">Verify Reset Code</h2>
+    <p class="mb-4">Enter the 6‑digit code we sent to <strong>@Model.Email</strong>.</p>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form asp-action="Verify" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Email" />
+
+        <div class="form-floating mb-3">
+            <input asp-for="Code" class="form-control" maxlength="6" />
+            <label asp-for="Code"></label>
+            <span asp-validation-for="Code" class="text-danger small"></span>
+        </div>
+
+        <button type="submit" class="btn btn-owl w-100 mb-3">Verify</button>
+    </form>
+
+    <!-- RESEND SECTION -->
+    <div class="text-center">
+        <button id="resendBtn" class="btn btn-link p-0" disabled>
+            Resend code <span id="count">(120)</span>s
+        </button>
+        <div id="resendMsg" class="small mt-2 text-success d-none">New code sent! Check your inbox.</div>
+        <div id="resendErr" class="small mt-2 text-danger d-none"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (() => {
+            const btn     = document.getElementById('resendBtn');
+            const cntSpan = document.getElementById('count');
+            const okMsg   = document.getElementById('resendMsg');
+            const errMsg  = document.getElementById('resendErr');
+            const email   = '@Model.Email';
+
+            /* grab the hidden antiforgery token that Html.AntiForgeryToken() injected */
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            let secs = 120;
+            const tick = () => {
+                secs--;
+                cntSpan.textContent = secs;
+                if (secs <= 0) { btn.disabled = false; btn.textContent = "Resend code"; clearInterval(tid); }
+            };
+            const tid = setInterval(tick, 1000);
+
+            btn.addEventListener('click', async () => {
+                btn.disabled = true; btn.textContent = "Sending…";
+                okMsg.classList.add('d-none'); errMsg.classList.add('d-none');
+
+                const res = await fetch('@Url.Action("ResendCode", "ForgotPassword")', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json",
+                               "RequestVerificationToken": token },
+                    body: JSON.stringify(email)
+                });
+                const js = await res.json();
+
+                if (js.ok){
+                    okMsg.classList.remove('d-none');
+                    secs = 120; cntSpan.textContent = secs;
+                    btn.textContent = "Resend code (120)s";
+                    clearInterval(tid); tick(); setInterval(tick, 1000);
+                } else {
+                    errMsg.textContent = js.error || "Error sending code.";
+                    errMsg.classList.remove('d-none');
+                    btn.disabled = false; btn.textContent = "Resend code";
+                }
+            });
+        })();
+    </script>
+}
+
+<style>
+    .text-owl-purple {
+        color: #5d16c1
+    }
+
+    .btn-owl {
+        background: #5d16c1;
+        color: #fff;
+        border-radius: 2rem
+    }
+
+        .btn-owl:hover {
+            background: #44109b
+        }
+</style>

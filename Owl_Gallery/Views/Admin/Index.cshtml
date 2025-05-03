@@ -1,0 +1,102 @@
+﻿@{
+    ViewBag.Title = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Welcome to Admin Dashboard 🦉</h1>
+
+    <!-- Stats Cards -->
+    <div class="row text-center mb-5">
+        <div class="col-md-3">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                <h3>@ViewBag.TotalProducts</h3>
+                <p>Products</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                <h3>@ViewBag.TotalUsers</h3>
+                <p>Users</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                <h3>@ViewBag.TotalOrders</h3>
+                <p>Orders</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                <h3>@ViewBag.TotalSales</h3> <!-- Added Total Sales -->
+                <p>Sales</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Buttons -->
+    <div class="d-flex justify-content-center gap-4 mb-5">
+        <a class="btn" href="@Url.Action("ManageProducts", "Admin")" style="background-color: #4dc9f6; color: white; padding: 0.75rem 1.5rem; font-size: 1.1rem; border-radius: 0.5rem;">
+            Manage Products
+        </a>
+
+        <a class="btn" href="@Url.Action("ManageUsers", "Admin")" style="background-color: #4bc0c0; color: white; padding: 0.75rem 1.5rem; font-size: 1.1rem; border-radius: 0.5rem;">
+            Manage Users
+        </a>
+
+        <a class="btn" href="@Url.Action("ManageOrders", "Admin")" style="background-color: #ffcd56; color: black; padding: 0.75rem 1.5rem; font-size: 1.1rem; border-radius: 0.5rem;">
+            Manage Orders
+        </a>
+        <a class="btn" href="@Url.Action("ManageSales", "Admin")" style="background-color: #ff6347; color: white; padding: 0.75rem 1.5rem; font-size: 1.1rem; border-radius: 0.5rem;">
+            Manage Sales
+        </a>
+    </div>
+
+    <!-- Chart -->
+    <div class="card mb-5 shadow p-4">
+        <canvas id="myChart" style="height:300px;"></canvas>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Products', 'Users', 'Orders', 'Sales'],  // Added Sales label
+            datasets: [{
+                label: 'Total Count',
+                data: [
+    @ViewBag.TotalProducts,
+    @ViewBag.TotalUsers,
+    @ViewBag.TotalOrders,
+    @ViewBag.TotalSales  // Added Total Sales
+                ],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',  // Products
+                    'rgba(75, 192, 192, 0.7)',  // Users
+                    'rgba(255, 206, 86, 0.7)',  // Orders
+                    'rgba(255, 99, 132, 0.7)'   // Sales (added a new color for Sales)
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',  // Products
+                    'rgba(75, 192, 192, 1)',  // Users
+                    'rgba(255, 206, 86, 1)',  // Orders
+                    'rgba(255, 99, 132, 1)'   // Sales (added a new color for Sales)
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeOutBounce'
+            }
+        }
+    });
+</script>

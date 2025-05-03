@@ -1,0 +1,132 @@
+﻿@model List<Owl_Gallery.Models.Order>
+
+@{
+    ViewData["Title"] = "Manage Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Orders</h2>
+        <a class="btn btn-secondary" href="@Url.Action("Index", "Admin")">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card shadow p-4">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>User ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Total (EGP)</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td>@order.Id</td>
+                            <td>@order.UserId</td>
+                            <td>@order.FirstName</td>
+                            <td>@order.LastName</td>
+                            <td>@order.Total.ToString("C", new System.Globalization.CultureInfo("en-EG"))</td>
+                            <td>@order.CreatedAt.ToString("g")</td>
+                            <td>
+                                <form method="post" asp-action="DeleteOrder" asp-route-id="@order.Id" class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm confirm-delete">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("ManageOrders", new { page = ViewBag.CurrentPage - 1 })">Previous</a>
+                    </li>
+
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("ManageOrders", new { page = i })">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("ManageOrders", new { page = ViewBag.CurrentPage + 1 })">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Confirm DELETE
+            const deleteButtons = document.querySelectorAll('.confirm-delete');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This will be deleted permanently!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            button.closest('form').submit();
+                        }
+                    });
+                });
+            });
+
+            // Confirm SAVE (edit/save forms)
+            const saveButtons = document.querySelectorAll('.confirm-save');
+            saveButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: 'Save Changes?',
+                        text: "Do you want to save these changes?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, save it!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            button.closest('form').submit();
+                        }
+                    });
+                });
+            });
+
+        });
+    </script>
+}

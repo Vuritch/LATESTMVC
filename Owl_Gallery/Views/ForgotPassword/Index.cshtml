@@ -1,0 +1,55 @@
+﻿@model Owl_Gallery.ViewModels.ForgotPasswordViewModel
+
+@{
+    ViewData["Title"] = "Forgot Password";
+}
+
+<div class="container py-5" style="max-width: 500px;">
+    <h2 class="mb-3 text-owl-purple fw-bold">Forgot Your Password?</h2>
+    <p class="text-muted">Enter your registered email address to receive a reset code.</p>
+
+    <!-- Success or Error Toasts -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success mt-3">
+            @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mt-3">
+            @TempData["Error"]
+        </div>
+    }
+
+    <form asp-action="Index" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+
+        <div class="form-floating mb-3">
+            <input asp-for="Email" class="form-control" placeholder="Email Address" />
+            <label asp-for="Email">Email Address</label>
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+
+        <button type="submit" class="btn btn-owl btn-lg w-100">Send Reset Code</button>
+    </form>
+</div>
+
+<style>
+    .text-owl-purple {
+        color: #5d16c1;
+    }
+
+    .btn-owl {
+        background-color: #5d16c1;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.6rem 1.25rem;
+        border-radius: 0.5rem;
+        transition: background 0.3s ease;
+    }
+
+        .btn-owl:hover {
+            background-color: #4a109e;
+        }
+</style>

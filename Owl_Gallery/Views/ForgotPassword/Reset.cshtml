@@ -1,0 +1,48 @@
+﻿@model Owl_Gallery.ViewModels.SetPasswordViewModel
+@{
+    ViewData["Title"] = "Reset Password";
+}
+
+<div class="container py-5">
+    <h2 class="mb-4 text-owl-purple">🔐 Set a New Password</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <form asp-action="Reset" method="post" novalidate>
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Email" />
+
+        <div class="form-floating mb-3">
+            <input asp-for="Password" class="form-control" placeholder=" " />
+            <label asp-for="Password">New Password</label>
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="ConfirmPassword" class="form-control" placeholder=" " />
+            <label asp-for="ConfirmPassword">Confirm Password</label>
+            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+        </div>
+
+        <div class="text-muted mb-3 small">
+            <ul>
+                <li>Minimum 8 characters</li>
+                <li>At least one uppercase and one lowercase letter</li>
+                <li>At least one number</li>
+            </ul>
+        </div>
+
+        <button type="submit" class="btn btn-owl btn-lg">Reset Password</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

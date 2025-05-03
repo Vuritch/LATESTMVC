@@ -1,0 +1,116 @@
+﻿@model Owl_Gallery.Models.Sale
+@using System.Globalization           <!-- for .ToString("F2") -->
+@{
+    ViewData["Title"] = "Edit Sale";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <h2>Edit Sale</h2>
+
+    <form asp-action="EditSale" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <input type="hidden" asp-for="SaleIdId" />
+
+        <!-- ---------- PRODUCT ------------ -->
+<div class="mb-3">
+    <label asp-for="ProductId" class="form-label">Product</label>
+
+    <select id="ProductId" asp-for="ProductId" class="form-select">
+        <option value="">-- Select Product --</option>
+
+                @foreach (var p in (IEnumerable<Owl_Gallery.Models.Product>)ViewBag.Products)
+                {
+                    var priceStr = p.Price.ToString("F2", CultureInfo.InvariantCulture);
+
+                    if (p.Id == Model?.ProductId)          // ← the item that’s currently selected
+                    {
+                        @:
+                        <option value="@p.Id" data-price="@priceStr" selected>@p.Name</option>
+                    }
+                    else                                   // ← all the other items
+                    {
+                        @:
+                        <option value="@p.Id" data-price="@priceStr">@p.Name</option>
+                    }
+                }
+            </select>
+
+    <span asp-validation-for="ProductId" class="text-danger small"></span>
+</div>
+
+        <!-- ---------- SALE PRICE ---------- -->
+        <div class="mb-3">
+            <label asp-for="SalePrice" class="form-label">Sale Price (EGP)</label>
+            <input id="SalePrice" asp-for="SalePrice" class="form-control" />
+            <span asp-validation-for="SalePrice" class="text-danger small"></span>
+        </div>
+
+        <!-- ---------- DISCOUNT % ---------- -->
+        <div class="mb-3">
+            <label asp-for="DiscountPercentage" class="form-label">Discount %</label>
+            <input id="DiscountPercentage" asp-for="DiscountPercentage" class="form-control" />
+            <span asp-validation-for="DiscountPercentage" class="text-danger small"></span>
+        </div>
+
+        <!-- ---------- DATES --------------- -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label asp-for="StartDate" class="form-label">Start Date</label>
+                <input asp-for="StartDate" type="date" class="form-control" />
+                <span asp-validation-for="StartDate" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="EndDate" class="form-label">End Date</label>
+                <input asp-for="EndDate" type="date" class="form-control" />
+                <span asp-validation-for="EndDate" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="ManageSales" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <!-- live two‑way calculator (Sale Price ↔ Discount %) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const ddl   = document.getElementById('ProductId');
+            const price = document.getElementById('SalePrice');
+            const disc  = document.getElementById('DiscountPercentage');
+
+            const round2 = v => isFinite(v) ? (Math.round(v * 100) / 100).toFixed(2) : '';
+
+            const basePrice = () =>
+                parseFloat(ddl.selectedOptions[0]?.dataset.price || 0);
+
+            /* when product changes ------------------------------------------ */
+            ddl.addEventListener('change', () => {
+                const base = basePrice();
+                if (!base) { price.value = disc.value = ''; return; }
+
+                if (disc.value)
+                    price.value = round2(base * (1 - parseFloat(disc.value) / 100));
+                else if (price.value)
+                    disc.value  = round2(100 * (1 - parseFloat(price.value) / base));
+            });
+
+            /* typing SALE PRICE → update % ---------------------------------- */
+            price.addEventListener('input', () => {
+                const base = basePrice(), s = parseFloat(price.value);
+                if (base && s) disc.value = round2(100 * (1 - s / base));
+            });
+
+            /* typing DISCOUNT % → update price ------------------------------ */
+            disc.addEventListener('input', () => {
+                const base = basePrice(), d = parseFloat(disc.value);
+                if (base && d) price.value = round2(base * (1 - d / 100));
+            });
+        });
+    </script>
+}

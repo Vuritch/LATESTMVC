@@ -1,0 +1,210 @@
+﻿@model Owl_Gallery.Models.Product
+@using System.Security.Claims
+@inject Owl_Gallery.Data.ApplicationDbContext _ctx
+@using Owl_Gallery.Helpers                         <!-- NEW -->
+@{
+    ViewData["Title"] = "Product Details";
+    var product = Model;
+
+    /* ---------- live sale price ---------- */
+    var sales = (IQueryable<Owl_Gallery.Models.Sale>)ViewBag.ActiveSales;
+    decimal price = product.GetCurrentPrice(sales);            // NEW
+    bool onSale = price < product.Price;                     // NEW
+
+    /* ---------- user / favorites ---------- */
+    bool signedIn = User.Identity?.IsAuthenticated == true;
+    int userId = signedIn ? int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!) : 0;
+    bool isFav = signedIn && _ctx.Favorites.Any(f => f.UserId == userId && f.ProductId == product.Id);
+
+    /* Dummy rating & review count */
+    double rating = 4.3;
+    int reviews = 54;
+}
+
+<div class="product-details-wrapper">
+    <div class="container py-5">
+        <div class="row gx-5 gy-4">
+            <!-- IMAGE -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <img src="@product.ImageUrl"
+                         class="card-img-top"
+                         alt="@product.Name"
+                         style="cursor: zoom-in;"
+                         data-bs-toggle="modal"
+                         data-bs-target="#zoomModal" />
+                </div>
+            </div>
+
+            <!-- DETAILS & ACTIONS -->
+            <div class="col-lg-6">
+                <h1 class="fw-bold mb-3">@product.Name</h1>
+
+                <!-- Rating -->
+                <div class="mb-2">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        if (i <= Math.Floor(rating))
+                        {
+                            <i class="fas fa-star text-warning"></i>
+                        }
+                        else if (i - rating < 1)
+                        {
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        }
+                        else
+                        {
+                            <i class="far fa-star text-warning"></i>
+                        }
+                    }
+                    <small class="text-muted ms-2">(@reviews reviews)</small>
+                </div>
+
+                <!-- Price -->
+                <!-- Price block -->
+                <h2 class="fw-bold mb-3">
+                    @if (onSale)
+                    {
+                        <span class="text-decoration-line-through text-muted me-2">
+                            EGP @product.Price.ToString("F2")
+                        </span>
+                        <span class="text-danger me-2">
+                            EGP @price.ToString("F2")
+                        </span>
+
+                        <!-- NEW discount badge -->
+                        <span class="badge bg-success align-middle">
+                            -@Math.Round(100 - 100 * price / product.Price)%
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="text-primary">EGP @price.ToString("F2")</span>
+                    }
+                </h2>
+
+
+                <!-- Stock -->
+                <div class="mb-4">
+                    @if (product.Quantity == 0)
+                    {
+                        <span class="badge bg-danger">Out of Stock</span>
+                    }
+                    else if (product.Quantity < 10)
+                    {
+                        <span class="badge bg-warning text-dark">Only @product.Quantity left!</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">In Stock</span>
+                    }
+                </div>
+
+                <!-- Quantity selector -->
+                <div class="d-flex align-items-center mb-4">
+                    <label for="qtyInput" class="me-3 mb-0">Quantity:</label>
+                    <input id="qtyInput" type="number" class="form-control w-25"
+                           value="1" min="1" max="@Math.Max(1, product.Quantity)" />
+                </div>
+
+                <!-- Add to Cart + Favorite -->
+                <div class="d-flex gap-2 mb-5">
+                    <form asp-controller="Cart" asp-action="Add" method="post" class="flex-grow-1">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@product.Id" />
+                        <input type="hidden" id="qtyField" name="quantity" value="1" />
+                        <button type="submit" class="btn btn-lg btn-primary w-100"
+                        @(product.Quantity == 0 ? "disabled" : "")>
+                            <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                        </button>
+                    </form>
+
+                    <form asp-controller="Favorites"
+                          asp-action="@(isFav ? "Remove" : "Add")"
+                          method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@product.Id" />
+                        <button type="submit"
+                                class="btn btn-lg @(isFav ? "btn-danger" : "btn-outline-danger")">
+                            <i class="@(isFav ? "fas" : "far") fa-heart"></i>
+                        </button>
+                    </form>
+                    <!-- ← Back to Products -->
+                    <a asp-controller="Products" asp-action="Products"
+                       class="btn btn-outline-secondary">
+                        ← Back to Products
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="row mt-5">
+            <div class="col">
+                <h3 class="mb-3">Product Description</h3>
+                <div class="p-4 bg-light rounded">
+                    @Html.Raw(product.Description.Replace("\n", "<br/>"))
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Zoom Modal -->
+<div class="modal fade" id="zoomModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 bg-transparent">
+            <div class="modal-body p-0">
+                <img id="zoomedImage" src="" class="w-100 rounded" />
+            </div>
+            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                    data-bs-dismiss="modal"></button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Sync qty field
+        const qtyInput = document.getElementById('qtyInput');
+        const qtyField = document.getElementById('qtyField');
+        qtyInput.addEventListener('change', () => {
+            let v = parseInt(qtyInput.value) || 1;
+            v = Math.max(1, Math.min(v, @product.Quantity));
+            qtyInput.value = v;
+            qtyField.value = v;
+        });
+
+        // Zoom modal
+        document.querySelector('[data-bs-target="#zoomModal"]')
+            .addEventListener('click', e => {
+                document.getElementById('zoomedImage').src = e.target.src;
+            });
+    </script>
+}
+
+<style>
+    .product-details-wrapper {
+        background: linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+        padding: 3rem 0;
+    }
+
+        .product-details-wrapper .card {
+            background-color: rgba(255,255,255,0.85);
+        }
+
+    .card-img-top {
+        max-height: 350px;
+        object-fit: cover;
+        margin: 0 auto;
+    }
+
+    .badge {
+        font-size: .9rem;
+        padding: .5em .75em;
+    }
+
+    .bg-light {
+        --bs-bg-opacity: .3;
+    }
+</style>

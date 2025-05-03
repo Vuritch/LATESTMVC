@@ -1,0 +1,210 @@
+﻿@model IEnumerable<Owl_Gallery.Models.Sale>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Sales";
+    var favorites = ViewBag.Favorites as List<int> ?? new List<int>(); // Get user's favorite product IDs if available
+}
+
+<div class="container my-5">
+    <h1 class="mb-5 text-center fw-bold text-owl-purple animate__animated animate__fadeInDown">
+        🎉 Current Sales
+    </h1>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info text-center shadow p-4 rounded animate__animated animate__fadeIn">
+            <p class="mb-1">No products are currently on sale.</p>
+            <a asp-controller="Products" asp-action="Products" class="btn btn-outline-secondary mt-3">
+                Browse All Products
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var sale in Model)
+            {
+                if (sale?.Product != null)
+                {
+                    var p = sale.Product;
+                    var isFav = favorites.Contains(p.Id); // Check if the product is already favorited
+
+                    <div class="col-sm-6 col-md-4 col-lg-3 animate__animated animate__zoomIn">
+                        <div class="card border-0 h-100 shadow-sm product-card">
+                            <div class="position-relative">
+                                <img src="@p.ImageUrl"
+                                     class="card-img-top rounded-top"
+                                     alt="@p.Name"
+                                     style="object-fit: cover; height: 230px;" />
+                                <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-3 py-2 rounded-pill">
+                                    <i class="fas fa-tag"></i> Sale
+                                </span>
+                            </div>
+
+                            <div class="card-body d-flex flex-column p-3">
+                                <h5 class="card-title fw-semibold text-dark text-truncate">@p.Name</h5>
+                                <p class="price-tag mb-1 text-muted">
+                                    <del>EGP @Math.Round(p.Price)</del>
+                                </p>
+                                <p class="price-tag mb-3 text-success">
+                                    EGP @(sale.SalePrice.HasValue ? Math.Round(sale.SalePrice.Value) : Math.Round(p.Price))
+                                </p>
+
+                                <p class="small text-muted">
+                                    <strong>Discount:</strong> <span class="text-danger fw-bold">@sale.DiscountPercentage%</span>
+                                </p>
+
+                                <div class="d-flex gap-2 mt-auto">
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                        @* Favorites Button *@
+                                        @if (isFav)
+                                        {
+                                            <form asp-controller="Favorites"
+                                                  asp-action="Remove"
+                                                  method="post"
+                                                  class="flex-fill">
+                                                @Html.AntiForgeryToken()
+                                                <input name="productId" type="hidden" value="@p.Id" />
+                                                <button type="submit"
+                                                        class="btn btn-danger w-100"
+                                                        title="Remove from favorites">
+                                                    <i class="fas fa-heart"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-controller="Favorites"
+                                                  asp-action="Add"
+                                                  method="post"
+                                                  class="flex-fill">
+                                                @Html.AntiForgeryToken()
+                                                <input name="productId" type="hidden" value="@p.Id" />
+                                                <button type="submit"
+                                                        class="btn btn-outline-danger w-100"
+                                                        title="Add to favorites">
+                                                    <i class="far fa-heart"></i>
+                                                </button>
+                                            </form>
+                                        }
+
+                                        @* Cart Button *@
+                                        @if (p.Quantity > 0)
+                                        {
+                                            <form asp-controller="Cart" asp-action="Add" method="post" class="w-50">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="productId" value="@p.Id" />
+                                                <button type="submit" class="btn btn-purple btn-glow w-100 py-2">
+                                                    <i class="fas fa-shopping-cart"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-secondary w-50" disabled>
+                                                <i class="fas fa-shopping-cart"></i>
+                                            </button>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <button type="button"
+                                                class="btn btn-outline-secondary flex-fill"
+                                                onclick="location.href='@Url.Action("Login","Login")'">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-outline-secondary flex-fill"
+                                                onclick="location.href='@Url.Action("Login","Login")'">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .text-owl-purple {
+        color: #5d16c1;
+    }
+
+    .bg-owl-purple {
+        background-color: #5d16c1;
+    }
+
+    .btn-owl {
+        background-color: #5d16c1;
+        color: #fff;
+        font-weight: 600;
+        border-radius: .5rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn-owl:hover {
+            background-color: #44109b;
+            box-shadow: 0 0.5rem 1rem rgba(93, 22, 193, 0.2);
+        }
+
+    .btn-outline-secondary {
+        color: #6c757d;
+        border: 1px solid #6c757d;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+    .btn-outline-danger {
+        color: #dc3545;
+        border: 1px solid #dc3545;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+    .btn-purple {
+        background-color: #5d16c1;
+        color: #fff;
+        font-weight: 600;
+        border-radius: .5rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn-purple:hover {
+            background-color: #44109b;
+            color: #fff;
+        }
+
+    .product-card {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        border-radius: 1rem;
+    }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+    .price-tag {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: .5rem;
+    }
+</style>

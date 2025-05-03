@@ -1,0 +1,42 @@
+﻿@model Owl_Gallery.ViewModels.SetPasswordViewModel
+@{
+    ViewData["Title"] = "Set Your Password";
+}
+<div class="container py-5">
+    <h2 class="text-owl-purple mb-3">Complete Your Registration</h2>
+
+    <!-- 🔐 Explanation Message -->
+    <div class="alert alert-warning shadow-sm border-start border-4 border-warning" role="alert">
+        <strong>To continue:</strong> You must complete your registration by setting a secure password.
+        This is required to access features like favorites, checkout, and more.
+    </div>
+
+    <form asp-action="Index" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="Email" />
+
+        <div class="form-floating mb-3">
+            <input asp-for="Password" class="form-control" placeholder=" " />
+            <label asp-for="Password">New Password</label>
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="ConfirmPassword" class="form-control" placeholder=" " />
+            <label asp-for="ConfirmPassword">Confirm Password</label>
+            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+        </div>
+
+        <div class="text-muted mb-3 small">
+            <ul>
+                <li>At least 8 characters</li>
+                <li>At least 1 uppercase letter</li>
+                <li>At least 1 lowercase letter</li>
+                <li>At least 1 number</li>
+            </ul>
+        </div>
+
+        <button type="submit" class="btn btn-owl btn-lg">Set Password</button>
+    </form>
+</div>

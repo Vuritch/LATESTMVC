@@ -1,0 +1,149 @@
+﻿@model Owl_Gallery.Models.LoginModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Login";
+    ViewData["BodyClass"] = "auth-bg";
+    bool isLogin = true;
+}
+
+<style>
+    body.auth-bg {
+        background: url('/images/dddd.jpg') center/cover no-repeat fixed;
+        background-size: cover;
+    }
+
+        body.auth-bg::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+
+    .auth-page {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+    }
+
+    .auth-card {
+        background: rgba(255,255,255,0.85);
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .btn-google {
+        background: white;
+        color: #444;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+        .btn-google:hover {
+            background: #f8f8f8;
+            border-color: #bbb;
+            color: #222;
+        }
+</style>
+
+<div class="auth-page">
+    <div class="auth-card">
+
+        <!-- TAB BAR -->
+        <div class="auth-tabs mb-4">
+            <a class="auth-tab @(isLogin ? "active" : "")"
+               href="@Url.Action("Login","Login")">Login</a>
+            <a class="auth-tab @(!isLogin ? "active" : "")"
+               href="@Url.Action("Register","Register")">Register</a>
+            <div class="tab-slider"
+                 style="transform:translateX(@(isLogin?0:100)%);"></div>
+        </div>
+
+        <!-- BODY -->
+        <div class="auth-body">
+            <h2 class="auth-title mb-3">Welcome Back</h2>
+
+            <div asp-validation-summary="All"
+                 class="text-danger mb-3"></div>
+
+            <div class="mt-4 text-center mb-4">
+                <p class="text-muted mb-2">Or continue with</p>
+                <a class="btn btn-google w-100 d-flex align-items-center justify-content-center gap-2"
+                   href="@Url.Action("GoogleLogin","ExternalLogin")">
+                    <img src="https://developers.google.com/identity/images/g-logo.png"
+                         alt="Google Logo" width="20" height="20" />
+                    <span>Sign in with Google</span>
+                </a>
+            </div>
+
+            <div class="d-flex align-items-center my-4">
+                <hr class="flex-grow-1" />
+                <span class="px-2 small text-muted">OR</span>
+                <hr class="flex-grow-1" />
+            </div>
+
+            <form asp-controller="Login"
+                  asp-action="Login"
+                  method="post"
+                  novalidate>
+                @Html.AntiForgeryToken()
+                <div class="form-group mb-3">
+                    <input asp-for="Email"
+                           type="email"
+                           placeholder=" "
+                           autocomplete="username"
+                           class="form-control" />
+                    <label>Email address</label>
+                    <span asp-validation-for="Email"
+                          class="text-danger small"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <input asp-for="Password"
+                           type="password"
+                           placeholder=" "
+                           autocomplete="current-password"
+                           class="form-control" />
+                    <label>Password</label>
+                    <span asp-validation-for="Password"
+                          class="text-danger small"></span>
+                </div>
+                <div class="form-check mb-4">
+                    <input asp-for="RememberMe"
+                           class="form-check-input"
+                           id="rememberMeCheck" />
+                    <label asp-for="RememberMe"
+                           class="form-check-label"
+                           for="rememberMeCheck">Remember me</label>
+                </div>
+                <button type="submit"
+                        class="btn-animate w-100 mb-3">
+                    Log In
+                </button>
+                <p class="text-end">
+                    <a href="@Url.Action("Index","ForgotPassword")"
+                       class="small text-primary">
+                        Forgot your password?
+                    </a>
+                </p>
+            </form>
+
+            <p class="switch-link mt-3 text-center">
+                Don’t have an account?
+                <a href="@Url.Action("Register","Register")">Sign up</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

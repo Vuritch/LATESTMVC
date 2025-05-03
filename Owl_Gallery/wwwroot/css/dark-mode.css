@@ -1,0 +1,839 @@
+﻿/* ─── Dark Mode Variables ───────────────────────────────────────── */
+:root.dark-mode {
+    --dm-bg-base: #121218; /* page background */
+    --dm-bg-surface: rgba(31,31,35,0.75); /* frosted panels */
+    --dm-bg-alt: rgba(31,31,35,0.85); /* solid sections */
+    --dm-text-primary: #e1e1e6;
+    --dm-text-secondary: #c4c4cc;
+    --dm-border: #2c2c33;
+    --dm-accent: #5d16c1;
+    --dm-accent-hover: rgba(93,22,193,0.8);
+    --dm-error: #f04438;
+    --dm-success: #4ade80;
+}
+
+/* ─── Base Body ──────────────────────────────────────────────────── */
+body.dark-mode {
+    background-color: var(--dm-bg-base) !important;
+    color: var(--dm-text-primary) !important;
+}
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+#searchInput {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border: 1px solid #333;
+    padding: 10px;
+    width: 100%;
+}
+
+#resultsContainer .resultItem {
+    background-color: #1e1e1e;
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #333;
+}
+/* Smooth, consistent search input styling */
+.search-box {
+    border-radius: 50px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    background: #fff;
+}
+
+    .search-box input[type="text"] {
+        border: none;
+        outline: none;
+        border-radius: 0;
+        padding: 0.75rem 1.5rem;
+        flex: 1;
+        background-color: transparent;
+        box-shadow: none;
+    }
+/* Fix for search box in dark mode */
+body.dark-mode .search-box {
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+    body.dark-mode .search-box input {
+        background-color: transparent;
+        color: #eee;
+    }
+
+    body.dark-mode .search-box button {
+        background-color: #7a42f4;
+        color: #fff;
+        border-left: 1px solid #555;
+        border-top-right-radius: 50px;
+        border-bottom-right-radius: 50px;
+    }
+/* Core search box styling */
+.search-box {
+    border-radius: 999px !important;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #ddd;
+}
+
+    /* Input field inside */
+    .search-box input {
+        border: none;
+        border-radius: 999px;
+        padding-left: 1.2rem;
+        background-color: transparent;
+        box-shadow: none !important;
+    }
+
+    /* Search button inside */
+    .search-box button {
+        background-color: #6a0dad;
+        color: white;
+        border: none;
+        padding: 0.4rem 1rem;
+        border-top-right-radius: 999px;
+        border-bottom-right-radius: 999px;
+    }
+
+/* Dark mode search bar */
+body.dark-mode .search-box {
+    background-color: #1f1f1f;
+    border: 1px solid #444;
+    box-shadow: 0 0 10px rgba(255,255,255,0.05);
+}
+
+    body.dark-mode .search-box input {
+        color: #eee;
+    }
+
+    body.dark-mode .search-box button {
+        background-color: #7a42f4;
+        color: #fff;
+    }
+
+    .search-box button {
+        background-color: transparent;
+        border: none;
+        padding: 0 1rem;
+        border-left: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search-box:focus-within {
+        box-shadow: 0 0 0 2px #7a42f4;
+    }
+
+
+#categoryFilters button {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border: 1px solid #333;
+    margin: 5px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+    #categoryFilters button:hover {
+        background-color: #333;
+    }
+
+    /* ─── Frosted Panels Everywhere ─────────────────────────────────── */
+    body.dark-mode .container,
+    body.dark-mode .card,
+    body.dark-mode .offcanvas,
+    body.dark-mode .dropdown-menu,
+    body.dark-mode .modal-content,
+    body.dark-mode .bg-white,
+    body.dark-mode .bg-light {
+        background: var(--dm-bg-surface) !important;
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--dm-border) !important;
+    }
+
+    /* ─── Solid Dark Sections ───────────────────────────────────────── */
+    body.dark-mode .hero-section,
+    body.dark-mode .featured-categories,
+    body.dark-mode .featured-products,
+    body.dark-mode .newsletter-section {
+        background-color: var(--dm-bg-alt) !important;
+        color: var(--dm-text-primary) !important;
+    }
+
+    /* ─── Navbar & Logo Swap ────────────────────────────────────────── */
+    body.dark-mode .navbar {
+        background-color: var(--dm-bg-surface) !important;
+        border-bottom: 1px solid var(--dm-border);
+    }
+
+    body.dark-mode .navbar-brand img {
+        content: url('/images/logo-light.svg') !important; /* your white logo */
+        filter: none !important;
+    }
+
+    body.dark-mode .navbar .nav-link {
+        color: var(--dm-text-secondary) !important;
+    }
+
+        body.dark-mode .navbar .nav-link:hover,
+        body.dark-mode .navbar .nav-link.active {
+            color: var(--dm-accent) !important;
+        }
+
+    body.dark-mode .navbar .nav-icon i {
+        color: var(--dm-text-secondary);
+    }
+
+    body.dark-mode .navbar .badge {
+        background: var(--dm-border) !important;
+        color: var(--dm-text-primary) !important;
+    }
+
+    /* ─── Forms & Inputs ─────────────────────────────────────────────── */
+    body.dark-mode .form-control,
+    body.dark-mode .form-select,
+    body.dark-mode .search-box input {
+        background: var(--dm-bg-alt) !important;
+        color: var(--dm-text-primary) !important;
+        border: 1px solid var(--dm-border) !important;
+    }
+
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            border-color: var(--dm-accent) !important;
+            box-shadow: 0 0 0 .2rem rgba(93,22,193,0.4) !important;
+        }
+
+    /* ─── Buttons ─────────────────────────────────────────────────────── */
+    body.dark-mode .btn-owl {
+        background: var(--dm-accent) !important;
+        color: #fff !important;
+    }
+
+        body.dark-mode .btn-owl:hover {
+            background: var(--dm-accent-hover) !important;
+        }
+
+    body.dark-mode .btn-outline-secondary {
+        color: var(--dm-text-secondary) !important;
+        border-color: var(--dm-border) !important;
+    }
+
+        body.dark-mode .btn-outline-secondary:hover {
+            background: var(--dm-bg-alt) !important;
+            color: var(--dm-text-primary) !important;
+            border-color: var(--dm-accent) !important;
+        }
+
+    /* ─── Typography & Links ─────────────────────────────────────────── */
+    body.dark-mode a,
+    body.dark-mode .breadcrumb,
+    body.dark-mode .breadcrumb a {
+        color: var(--dm-text-secondary) !important;
+    }
+
+        body.dark-mode a:hover,
+        body.dark-mode .breadcrumb a:hover {
+            color: var(--dm-accent) !important;
+        }
+
+    /* ─── Alerts & Validation ────────────────────────────────────────── */
+    body.dark-mode .alert-success {
+        background: rgba(74,222,128,0.15) !important;
+        color: var(--dm-success) !important;
+        border-color: rgba(74,222,128,0.4) !important;
+    }
+
+    body.dark-mode .alert-danger,
+    body.dark-mode .text-danger {
+        color: var(--dm-error) !important;
+    }
+    /* ─── Brighter Dark Navbar Override ───────────────────────────────── */
+    body.dark-mode .navbar {
+        background-color: #23232a !important; /* a touch lighter than pure black */
+        border-bottom: 1px solid #2e2e38 !important;
+    }
+
+        body.dark-mode .navbar .nav-link {
+            color: #ddd !important; /* light gray for readability */
+        }
+
+            body.dark-mode .navbar .nav-link:hover,
+            body.dark-mode .navbar .nav-link.active {
+                color: #fff !important; /* full white on hover/active */
+            }
+
+        body.dark-mode .navbar .search-box input {
+            background-color: #2e2e38 !important; /* slightly lighter input */
+            color: #eee !important;
+            border: 1px solid #444 !important;
+        }
+
+        body.dark-mode .navbar .navbar-brand,
+        body.dark-mode .navbar .navbar-brand img {
+            opacity: 0.9;
+        }
+/* ─── Base page background ───────────────────────────────────────── */
+body.dark-mode {
+    background-color: #18181c !important; /* very dark gray-purple */
+    color: #e0e0e0 !important;
+}
+
+    /* ─── Container & page wrapper ──────────────────────────────────── */
+    body.dark-mode .container,
+    body.dark-mode .card,
+    body.dark-mode main,
+    body.dark-mode footer,
+    body.dark-mode section,
+    body.dark-mode .hero-section,
+    body.dark-mode .featured-categories,
+    body.dark-mode .featured-products,
+    body.dark-mode .newsletter-section {
+        background-color: #1f1f23 !important; /* soft charcoal */
+        color: #e0e0e0 !important;
+    }
+
+    /* ─── Cards & Panels ───────────────────────────────────────────── */
+    body.dark-mode .card,
+    body.dark-mode .category-card,
+    body.dark-mode .product-card,
+    body.dark-mode .newsletter-form,
+    body.dark-mode .checkout-page .step-content,
+    body.dark-mode .search-box,
+    body.dark-mode .search-results {
+        background-color: #25252a !important; /* slightly lighter panel */
+        border: 1px solid #333 !important;
+        color: #e0e0e0 !important;
+    }
+
+    /* ─── Headings & Text ───────────────────────────────────────────── */
+    body.dark-mode h1,
+    body.dark-mode h2,
+    body.dark-mode h3,
+    body.dark-mode h4,
+    body.dark-mode h5,
+    body.dark-mode h6 {
+        color: #fff !important;
+    }
+
+    /* ─── Links & Buttons ──────────────────────────────────────────── */
+    body.dark-mode a {
+        color: #d0b3ff !important;
+    }
+
+        body.dark-mode a:hover {
+            color: #fff !important;
+        }
+
+    body.dark-mode .btn,
+    body.dark-mode .btn-primary,
+    body.dark-mode .btn-owl {
+        background-color: #5d16c1 !important;
+        color: #fff !important;
+        border: none !important;
+    }
+
+    body.dark-mode .btn-outline-secondary {
+        border-color: #555 !important;
+        color: #ccc !important;
+    }
+
+        body.dark-mode .btn-outline-secondary:hover {
+            background-color: #333 !important;
+            color: #fff !important;
+        }
+
+    /* ─── Forms & Inputs ───────────────────────────────────────────── */
+    body.dark-mode .form-control,
+    body.dark-mode .form-select,
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea {
+        background-color: #2a2a2e !important;
+        color: #e0e0e0 !important;
+        border: 1px solid #444 !important;
+    }
+
+        body.dark-mode .form-control::placeholder {
+            color: #aaa !important;
+        }
+
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            border-color: #5d16c1 !important;
+            box-shadow: 0 0 0 .25rem rgba(93,22,193,.4) !important;
+        }
+
+    /* ─── Validation messages ───────────────────────────────────────── */
+    body.dark-mode .text-danger {
+        color: #ff6b6b !important;
+    }
+
+    /* ─── Tables & lists ────────────────────────────────────────────── */
+    body.dark-mode table,
+    body.dark-mode th,
+    body.dark-mode td,
+    body.dark-mode ul,
+    body.dark-mode ol {
+        background: transparent !important;
+        color: #e0e0e0 !important;
+    }
+
+    /* ─── Breadcrumbs & page-header ────────────────────────────────── */
+    body.dark-mode .page-header,
+    body.dark-mode .breadcrumb,
+    body.dark-mode .breadcrumb a {
+        background: #25252a !important;
+        color: #aaa !important;
+    }
+
+        body.dark-mode .breadcrumb a:hover {
+            color: #fff !important;
+        }
+/* ─────────── THEME VARIABLES ─────────── */
+:root {
+    /* Light theme colors */
+    --bg: #ffffff;
+    --panel-bg: #f8f9fa;
+    --text: #212529;
+    --muted-text: #6c757d;
+    --border: #dee2e6;
+    --primary: #5d16c1;
+    --primary-light: rgba(93,22,193,.15);
+    --secondary: #6c757d;
+    --danger: #dc3545;
+    --card-shadow: rgba(0,0,0,.1);
+}
+
+body.dark-mode {
+    /* Dark theme overrides */
+    --bg: #18181c;
+    --panel-bg: #242629;
+    --text: #e0e0e0;
+    --muted-text: #aaa;
+    --border: #333;
+    --primary: #9b59b6; /* slightly lighter purple for contrast */
+    --primary-light: rgba(155,89,182,.3);
+    --secondary: #555;
+    --danger: #ff6b6b;
+    --card-shadow: rgba(0,0,0,.5);
+}
+
+/* Apply variables */
+body {
+    background-color: var(--bg) !important;
+    color: var(--text) !important;
+}
+
+a, .navbar .nav-link {
+    color: var(--text) !important;
+}
+
+    a:hover {
+        color: var(--primary) !important;
+    }
+
+.navbar {
+    background-color: var(--panel-bg) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+/* Panels/cards */
+.card,
+.page-header,
+.offcanvas,
+.dropdown-menu,
+.search-box,
+.search-results {
+    background-color: var(--panel-bg) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 2px 6px var(--card-shadow) !important;
+}
+
+/* Buttons */
+.btn-primary, .btn-owl {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+    .btn-primary:hover, .btn-owl:hover {
+        background-color: var(--primary-light) !important;
+    }
+
+.btn-outline-secondary {
+    border-color: var(--secondary) !important;
+    color: var(--text) !important;
+}
+
+    .btn-outline-secondary:hover {
+        background-color: var(--secondary) !important;
+        color: #fff !important;
+    }
+
+/* Form controls */
+.form-control,
+.form-select {
+    background-color: var(--bg) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+    .form-control::placeholder {
+        color: var(--muted-text) !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 .2rem var(--primary-light) !important;
+    }
+
+/* Validation */
+.text-danger {
+    color: var(--danger) !important;
+}
+/* ─── Dark-mode for auth cards ─────────────────────────────── */
+body.dark-mode .auth-card,
+body.dark-mode .auth-card .card {
+    background-color: var(--panel-bg) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 4px 12px var(--card-shadow) !important;
+}
+
+    body.dark-mode .auth-card .auth-tabs {
+        background: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    body.dark-mode .auth-card .auth-tab {
+        color: var(--muted-text);
+    }
+
+        body.dark-mode .auth-card .auth-tab.active {
+            color: var(--primary) !important;
+            border-color: var(--primary) !important;
+        }
+
+    body.dark-mode .auth-card .form-group input {
+        background-color: var(--bg) !important;
+        color: var(--text) !important;
+        border: 1px solid var(--border) !important;
+    }
+
+    body.dark-mode .auth-card .form-group label {
+        color: var(--text) !important;
+    }
+/* ─── Fix welcome banner in dark mode ────────────────────── */
+body.dark-mode #welcome-banner {
+    /* use a slightly lighter panel behind it */
+    background-color: rgba(93, 22, 193, 0.15) !important;
+    /* brighten the text so it stands out */
+    color: #f0f0f0 !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+/* ─── Dark-mode checkout validation alerts ──────────────── */
+/* your big “Please complete all required fields.” container */
+body.dark-mode .alert-danger {
+    background-color: #3b1f2b !important;
+    color: #ff7f7f !important;
+    border-color: #722f37 !important;
+}
+/* Navbar welcome text (in dark mode) */
+body.dark-mode .navbar-text {
+    color: #e0e0e0 !important;
+}
+/* ─── Dark-Mode Purple Page Header ───────────────────────────────── */
+
+body.dark-mode {
+    /* make sure your global dark background is set darker than this */
+    --bg-dark: #18181b;
+    background: var(--bg-dark);
+}
+    /* ─── Dark-Mode Purple “All Products” Header ───────────────────────────────── */
+
+    /* Target both .bg-gradient (if you used that) and any “page-header” wrapper */
+    body.dark-mode .bg-gradient,
+    body.dark-mode .bg-gradient.text-white,
+    body.dark-mode .page-header,
+    body.dark-mode .page-header.bg-gradient {
+        /* your purple gradient */
+        background: linear-gradient( 135deg, #5d16c1 0%, #8624d8 100% ) !important;
+        color: #fff !important;
+        border-radius: .375rem;
+        padding: 2rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+        /* Make sure the <h1> itself is bright */
+        body.dark-mode .bg-gradient h1,
+        body.dark-mode .page-header h1 {
+            color: #fff !important;
+        }
+
+        /* Breadcrumb text and links */
+        body.dark-mode .bg-gradient .breadcrumb,
+        body.dark-mode .page-header .breadcrumb {
+            background: transparent !important;
+            color: rgba(255,255,255,0.8) !important;
+        }
+/* ─── Dark-Mode Login/Register Form ───────────────────────────────── */
+body.dark-mode {
+    /* overall page bg already set */
+}
+
+    /* card wrapper */
+    body.dark-mode .card {
+        background: #1e1e1e !important; /* dark but not pitch black */
+        border-color: #333 !important;
+    }
+
+    /* form labels */
+    body.dark-mode .form-label,
+    body.dark-mode .form-check-label,
+    body.dark-mode .nav-link {
+        color: #e0e0e0 !important;
+    }
+
+    /* inputs */
+    body.dark-mode .form-control {
+        background: #2a2a2a !important;
+        border: 1px solid #444 !important;
+        color: #e0e0e0 !important;
+    }
+
+        /* placeholder text */
+        body.dark-mode .form-control::placeholder {
+            color: #aaa !important;
+        }
+
+    /* “Remember me” checkbox label */
+    body.dark-mode .form-check-label {
+        color: #e0e0e0 !important;
+    }
+
+    /* tabs */
+    body.dark-mode .card-header .nav-link {
+        color: #bbb !important;
+    }
+
+        body.dark-mode .card-header .nav-link.active {
+            color: #bb86fc !important;
+            border-color: #bb86fc !important;
+        }
+/* ─── Purple Header ────────────────────────────────────────────────── */
+/* light mode */
+.purple-header {
+    background: linear-gradient(90deg, #5d16c1, #a530f8);
+}
+
+/* dark mode override */
+body.dark-mode .purple-header {
+    /* solid purple so it reads well in dark */
+    background: #5d16c1 !important;
+}
+
+/* make sure breadcrumb links & text stay white */
+.purple-header .breadcrumb,
+.purple-header .breadcrumb a,
+.purple-header h1 {
+    color: #fff !important;
+}
+
+/* lighten the separator bullet */
+.purple-header .breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255,255,255,.7);
+}
+
+    /* button */
+    body.dark-mode .btn-primary,
+    body.dark-mode .btn-owl {
+        background: #bb86fc !important;
+        border-color: #bb86fc !important;
+        color: #121212 !important;
+    }
+
+    /* Make nav‐icon badges pop in dark mode */
+    body.dark-mode .nav-icon .badge {
+        background-color: #bb86fc !important; /* your purple accent */
+        color: #121212 !important; /* almost black text for max contrast */
+        border: 1px solid #ffffff33; /* faint white outline */
+        font-size: 0.65rem;
+    }
+
+            body.dark-mode .bg-gradient .breadcrumb a,
+            body.dark-mode .page-header .breadcrumb a {
+                color: rgba(255,255,255,0.8) !important;
+            }
+
+                body.dark-mode .bg-gradient .breadcrumb a:hover,
+                body.dark-mode .page-header .breadcrumb a:hover {
+                    color: #fff !important;
+                }
+
+    body.dark-mode .page-header {
+        /* override the white/gradient header in Products */
+        background: #5d16c1; /* your primary purple */
+        background: linear-gradient( 135deg, #5d16c1 0%, #8624d8 100% );
+        color: #fff !important;
+        padding: 2rem 1rem;
+        border-radius: 0.375rem;
+        margin-bottom: 1.5rem;
+    }
+
+        body.dark-mode .page-header h1 {
+            color: #fff !important;
+        }
+
+        body.dark-mode .page-header .breadcrumb {
+            background: transparent;
+            color: #ddd;
+        }
+
+            body.dark-mode .page-header .breadcrumb a {
+                color: rgba(255,255,255,0.75);
+            }
+
+                body.dark-mode .page-header .breadcrumb a:hover {
+                    color: #fff;
+                }
+
+    /* If you’re using a custom “text-owl” class there too: */
+    body.dark-mode .navbar-text.text-owl {
+        color: #ccc !important;
+    }
+
+/* ─── Make the “Remember me” text legible in dark mode ───────── */
+body.dark-mode .form-check-label,
+body.dark-mode label[for="RememberMe"],
+body.dark-mode input[type="checkbox"] + label {
+    color: #e0e0e0 !important;
+}
+
+/* inline field errors (validation-for spans) */
+body.dark-mode .text-danger {
+    color: #ff7f7f !important;
+}
+
+    body.dark-mode .auth-card .btn-animate,
+    body.dark-mode .auth-card button {
+        background-color: var(--primary) !important;
+        color: #fff !important;
+        border: none !important;
+    }
+
+    body.dark-mode .auth-card .text-danger {
+        color: var(--danger) !important;
+    }
+
+/* Footer */
+footer {
+    background-color: var(--panel-bg) !important;
+    color: var(--muted-text) !important;
+}
+
+/* Utility */
+hr {
+    border-color: var(--border) !important;
+}
+
+    /* ─── Footer ───────────────────────────────────────────────────── */
+    body.dark-mode footer {
+        background-color: #1a1a1d !important;
+        color: #888 !important;
+    }
+
+    /* ─── Offcanvas & dropdowns ────────────────────────────────────── */
+    body.dark-mode .offcanvas,
+    body.dark-mode .dropdown-menu {
+        background: #25252a !important;
+        border: 1px solid #333 !important;
+        color: #e0e0e0 !important;
+    }
+
+    body.dark-mode .dropdown-item {
+        color: #ccc !important;
+    }
+
+        body.dark-mode .dropdown-item:hover {
+            background: #333 !important;
+            color: #fff !important;
+        }
+
+    /* ─── Utility tweaks ───────────────────────────────────────────── */
+    body.dark-mode hr {
+        border-color: #333 !important;
+    }
+
+        body.dark-mode .navbar .nav-icon i {
+            color: #ccc !important; /* icons light gray */
+        }
+/* Add this to your dark-mode.css or style block */
+body.dark-mode .dark-mode-search-link {
+    background-color: #2c2c2c;
+    color: #fff !important;
+    border-color: #444;
+}
+
+.navbar {
+    border-bottom: 1px solid #eee;
+}
+.navbar {
+    border-bottom: none !important;
+    box-shadow: none !important; /* or use a soft shadow if you want depth */
+}
+
+    body.dark-mode #themeToggle i {
+        color: #ccc !important; /* toggle icon */
+    }
+body.dark-mode .search-box button i {
+    color: #fff !important; /* or any bright color */
+}
+body.dark-mode .search-box svg {
+    fill: #fff !important;
+}
+body.dark-mode .page-header {
+    background: linear-gradient(135deg, #5d16c1 0%, #8624d8 100%) !important;
+    color: #fff !important;
+    border-radius: 0.5rem;
+    padding: 2rem 1rem;
+    margin-bottom: 1.5rem;
+}
+body.dark-mode .page-header {
+    background-color: #1f1f1f !important;
+}
+
+
+    body.dark-mode .page-header h1,
+    body.dark-mode .page-header .breadcrumb,
+    body.dark-mode .page-header .breadcrumb a {
+        color: #fff !important;
+    }
+
+body.dark-mode .navbar .container,
+body.dark-mode .navbar .navbar-collapse {
+    border-radius: 999px;
+    background-color: var(--dm-bg-surface);
+    border: 1px solid var(--dm-border);
+}
+
+
+    /* ─── Footer ─────────────────────────────────────────────────────── */
+    body.dark-mode .footer {
+        background: var(--dm-bg-surface) !important;
+        color: var(--dm-text-secondary) !important;
+    }
+
+    /* ─── Utility ────────────────────────────────────────────────────── */
+    body.dark-mode hr {
+        border-color: var(--dm-border) !important;
+    }

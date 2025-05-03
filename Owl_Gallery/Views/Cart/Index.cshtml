@@ -1,0 +1,235 @@
+﻿@model IEnumerable<Owl_Gallery.Models.CartItem>
+@using System.Security.Claims
+@using Owl_Gallery.Helpers   <!-- enables GetCurrentPrice(...) -->
+@{
+    ViewData["Title"] = "Your Cart";
+
+    var sales = (IQueryable<Owl_Gallery.Models.Sale>)ViewBag.ActiveSales;
+    var items = Model.ToList();
+
+    decimal subtotal = items.Sum(ci => ci.Quantity * ci.Product.GetCurrentPrice(sales));
+    decimal savedTotal = items.Sum(ci =>
+                       (ci.Product.Price - ci.Product.GetCurrentPrice(sales)) * ci.Quantity);
+}
+
+<section class="cart-section py-5">
+    <div class="container">
+        <h1 class="mb-4 fw-bold text-owl-purple text-center animate__animated animate__fadeInDown">
+            🛒 Your Shopping Cart
+        </h1>
+
+        @if (!items.Any())
+        {
+            <div class="alert alert-info text-center p-4 rounded shadow-sm animate__animated animate__fadeIn">
+                <p class="mb-2">Your cart is currently empty.</p>
+                <a asp-controller="Products" asp-action="Products" class="btn btn-outline-purple mt-2">
+                    Continue Shopping
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="row gx-4 gy-5">
+
+                <!-- ░░░░░░ DESKTOP ░░░░░░ -->
+                <div class="col-md-8 d-none d-md-block">
+                    <div class="table-responsive rounded-4 overflow-hidden shadow-sm bg-white p-3">
+                        <table class="table align-middle mb-0">
+                            <thead class="bg-light text-secondary small text-uppercase">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-end">Price</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Total</th>
+                                    <th class="text-center">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var it in items)
+                                {
+                                    var unit = it.Product.GetCurrentPrice(sales);
+                                    var list = it.Product.Price;
+                                    var onSale = unit < list;
+                                    var pct = onSale ? Math.Round(100 - 100 * unit / list) : 0;
+                                    var line = unit * it.Quantity;
+                                    <tr class="border-bottom">
+                                        <td>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <img src="@it.Product.ImageUrl" alt="@it.ProductName" class="rounded shadow-sm" width="60" />
+                                                <strong>@it.ProductName</strong>
+                                            </div>
+                                        </td>
+                                        <td class="text-end fw-semibold">
+                                            @if (onSale)
+                                            {
+                                                <span class="text-muted text-decoration-line-through small me-1">
+                                                    EGP @list.ToString("F0")
+                                                </span>
+                                                <span class="badge bg-success me-1">‑@pct%</span>
+                                            }
+                                            <span class="text-success">EGP @unit.ToString("F0")</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <form asp-action="UpdateQuantity" method="post" class="d-inline-block">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="productId" value="@it.ProductId" />
+                                                <div class="btn-group btn-group-sm qty-group">
+                                                    <button type="submit" name="quantity" value="@(it.Quantity-1)"
+                                                            class="btn btn-outline-secondary qty-btn" @(it.Quantity <= 1 ? "disabled" : "")>
+                                                        −
+                                                    </button>
+                                                    <span class="btn btn-light disabled px-3">@it.Quantity</span>
+                                                    <button type="submit" name="quantity" value="@(it.Quantity+1)"
+                                                            class="btn btn-outline-secondary qty-btn">
+                                                        +
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </td>
+                                        <td class="text-end fw-semibold">EGP @line.ToString("F0")</td>
+                                        <td class="text-center">
+                                            <form asp-action="Remove" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="productId" value="@it.ProductId" />
+                                                <button class="btn btn-sm text-danger" title="Remove">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div><!-- /desktop -->
+                <!-- ░░░░░░ MOBILE CARDS ░░░░░░ -->
+                <div class="col-12 d-block d-md-none">
+                    @foreach (var it in items)
+                    {
+                        var unit = it.Product.GetCurrentPrice(sales);
+                        var list = it.Product.Price;
+                        var onSale = unit < list;
+                        var pct = onSale ? Math.Round(100 - 100 * unit / list) : 0;
+                        var line = unit * it.Quantity;
+                        <div class="card mb-3 shadow-sm">
+                            <div class="row g-0">
+                                <div class="col-4">
+                                    <img src="@it.Product.ImageUrl" class="img-fluid rounded-start" alt="@it.ProductName" />
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body p-2">
+                                        <h5 class="card-title mb-1">@it.ProductName</h5>
+                                        <p class="mb-1 fw-bold">
+                                            @if (onSale)
+                                            {
+                                                <span class="text-muted text-decoration-line-through small me-1">
+                                                    EGP @list.ToString("F0")
+                                                </span>
+                                                <span class="badge bg-success me-1">‑@pct%</span>
+                                            }
+                                            <span class="text-success">EGP @unit.ToString("F0")</span>
+                                        </p>
+
+                                        <div class="d-flex align-items-center mb-2">
+                                            <form asp-action="UpdateQuantity" method="post" class="d-inline-block me-2">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="productId" value="@it.ProductId" />
+                                                <div class="btn-group btn-group-sm qty-group">
+                                                    <button type="submit" name="quantity" value="@(it.Quantity-1)"
+                                                            class="btn btn-outline-secondary qty-btn" @(it.Quantity <= 1 ? "disabled" : "")>
+                                                        −
+                                                    </button>
+                                                    <span class="btn btn-light disabled px-2">@it.Quantity</span>
+                                                    <button type="submit" name="quantity" value="@(it.Quantity+1)"
+                                                            class="btn btn-outline-secondary qty-btn">
+                                                        +
+                                                    </button>
+                                                </div>
+                                            </form>
+                                            <form asp-action="Remove" method="post" class="ms-auto">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="productId" value="@it.ProductId" />
+                                                <button class="btn btn-sm text-danger"><i class="fas fa-trash-alt"></i></button>
+                                            </form>
+                                        </div>
+
+                                        <p class="mb-0 fw-semibold text-end">Total: EGP @line.ToString("F0")</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div><!-- /mobile -->
+                <!-- ░░░░░░ ORDER SUMMARY ░░░░░░ -->
+                <div class="col-md-4">
+                    <div class="cart-summary shadow-sm p-4 rounded bg-white sticky-top">
+                        <h4 class="mb-3 fw-bold">Order Summary</h4>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span><span>EGP @subtotal.ToString("F0")</span>
+                        </div>
+                        @if (savedTotal > 0)
+                        {
+                            <div class="d-flex justify-content-between text-success small mb-2">
+                                <span>You save</span><span>‑EGP @savedTotal.ToString("F0")</span>
+                            </div>
+                        }
+                        <hr />
+                        <div class="d-flex justify-content-between fw-bold fs-5 text-owl-purple mb-4">
+                            <span>Total</span><span>EGP @subtotal.ToString("F0")</span>
+                        </div>
+
+                        <a asp-controller="Checkout" asp-action="Index" class="btn btn-owl w-100 py-2">Checkout →</a>
+                        <a asp-controller="Products" asp-action="Products"
+                           class="btn btn-outline-purple w-100 mt-2">← Continue Shopping</a>
+                    </div>
+                </div><!-- /summary -->
+
+            </div>
+
+            <!-- /row -->
+        }
+    </div><!-- /container -->
+</section>
+
+
+<style>
+    .text-owl-purple {
+        color: #5d16c1;
+    }
+
+    .btn-owl {
+        background-color: #5d16c1;
+        color: #fff;
+        font-weight: 600;
+        border-radius: .5rem;
+        transition: all .3s ease;
+    }
+
+        .btn-owl:hover {
+            background-color: #44109b;
+            box-shadow: 0 10px 30px rgba(93,22,193,.3);
+        }
+
+    .btn-outline-purple {
+        color: #5d16c1;
+        border: 1px solid #5d16c1;
+    }
+
+        .btn-outline-purple:hover {
+            background-color: #5d16c1;
+            color: #fff;
+        }
+
+    .qty-group .qty-btn {
+        width: 2.5rem;
+    }
+
+    .cart-summary {
+        top: 2rem;
+    }
+
+    /* overall section background */
+    .cart-section {
+        background: radial-gradient(circle at top, #ffffff, #f4f5f7);
+    }
+</style>
