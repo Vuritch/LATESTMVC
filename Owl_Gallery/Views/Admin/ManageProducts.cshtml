@@ -1,12 +1,12 @@
 ﻿@model List<Owl_Gallery.Models.Product>
 @using System
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@using Owl_Gallery.Helpers   <!-- enables GetCurrentPrice(...) -->
+@using Owl_Gallery.Helpers
 @{
     ViewData["Title"] = "Manage Products";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var sales = (IQueryable<Owl_Gallery.Models.Sale>)ViewBag.ActiveSales;  // controller must supply this
+    var sales = (IQueryable<Owl_Gallery.Models.Sale>)ViewBag.ActiveSales;
 }
 
 <div class="container mt-5">

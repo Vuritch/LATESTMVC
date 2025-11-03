@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using Owl_Gallery.Data;
 using Owl_Gallery.Models;
-using Owl_Gallery.Services; // 👈 You need this for EmailSender
+using Owl_Gallery.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +36,7 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
-    // ✅ Force Google to always ask user which account to use
+   
     options.Events.OnRedirectToAuthorizationEndpoint = context =>
     {
         context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
@@ -52,7 +52,6 @@ var app = builder.Build();
 // 5) Middleware pipeline
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 

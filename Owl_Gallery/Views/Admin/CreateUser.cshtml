@@ -10,7 +10,7 @@
 
     <div class="card shadow p-4">
         <form asp-action="CreateUser" method="post">
-            @Html.AntiForgeryToken() <!-- 🛡️ Critical to add! -->
+            @Html.AntiForgeryToken() 
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
             <div class="mb-3">

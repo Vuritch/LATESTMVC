@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Owl_Gallery.Models.Product>
 @using System.Security.Claims
 @inject Owl_Gallery.Data.ApplicationDbContext _ctx
-@using Owl_Gallery.Helpers   <!-- enables GetCurrentPrice(...) -->
+@using Owl_Gallery.Helpers
 @{
     ViewData["Title"] = "Shop All";
 
@@ -115,8 +115,8 @@
                     @foreach (var p in Model)
                     {
                         bool isFav = favSet.Contains(p.Id);
-                        decimal price = p.GetCurrentPrice(sales);    /* NEW */
-                        bool onSale = price < p.Price;             /* NEW */
+                        decimal price = p.GetCurrentPrice(sales);    
+                        bool onSale = price < p.Price;           
 
                         <div class="col" data-aos="zoom-in">
                             <div class="card h-100 shadow-sm position-relative overflow-hidden">

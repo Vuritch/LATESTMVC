@@ -28,7 +28,6 @@ namespace Owl_Gallery.Models
 
         public bool PasswordSet { get; set; } = false;
 
-        // 🔐 Reset Password Support
         public string? ResetCode { get; set; }
 
         public DateTime? CodeSentAt { get; set; }

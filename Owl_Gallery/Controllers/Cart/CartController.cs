@@ -30,8 +30,7 @@ namespace Owl_Gallery.Controllers.Cart
                 .Include(c => c.Product)                 // ensure Product is loaded
                 .ToList();
 
-            /* expose active sales so view can call GetCurrentPrice(...) */
-            ViewBag.ActiveSales = _ctx.Sales.AsQueryable();          // NEW
+            ViewBag.ActiveSales = _ctx.Sales.AsQueryable();        
 
             return View(items);
         }

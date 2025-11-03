@@ -43,7 +43,7 @@ namespace Owl_Gallery.Controllers.Account
             {
                 ModelState.AddModelError(nameof(model.Email),
                     "This e-mail address is already registered.");
-                return View(model);                 // redisplay with validation error
+                return View(model);                
             }
 
             _context.Registers.Add(model);
